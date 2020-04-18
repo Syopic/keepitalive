@@ -6,6 +6,7 @@ class GameController {
 	public var mapDataStorage:MapDataStorage;
 
 	public var isPause:Bool = false;
+	public var isLocked:Bool = false;
 
 	public function new() {
 		mapDataStorage = new MapDataStorage(hxd.Res.map);
@@ -15,6 +16,10 @@ class GameController {
 		Game.view.init();
 		Game.inputController = new InputController();
 		this.isPause = false;
+	}
+
+	public function lockInput(isLock:Bool) {
+		isLocked = isLock;
 	}
 
 	public function endGame() {

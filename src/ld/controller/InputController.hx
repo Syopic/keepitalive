@@ -33,10 +33,8 @@ class InputController {
 				case Key.ESCAPE: 
 			}
 		} else if (event.kind == EPush) {
+			
 			if (event.button == Key.MOUSE_LEFT) {
-				
-			}
-			if (event.button == Key.MOUSE_RIGHT) {
 				startDragPosition = new Point(event.relX + Game.view.camera.viewX * Globals.SCALE_FACTOR,
 					event.relY + Game.view.camera.viewY * Globals.SCALE_FACTOR);
 				isDrag = true;

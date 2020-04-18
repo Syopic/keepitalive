@@ -44,13 +44,21 @@ class MapDataStorage {
 		
 		mapData = new MapData(mapWidth, mapHeight);
 
+		updateWalkableMap();
+		pathFinder = new Pathfinder(mapData);
+	}
+
+	public function updateWalkableMap() {
 		for (y in 0...mapHeight) {
 			for (x in 0...mapWidth) {
 				var tid = getTileId(x, y, 0);
 				mapData.setWalkable(x, y, tid == 0);
 			}
 		}
-		pathFinder = new Pathfinder(mapData);
+	}
+
+	public function setWalkable(x:Int, y:Int, value:Bool) {
+		mapData.setWalkable(x, y, value);
 	}
 	
 	public function findPath(from:Coordinate, to:Coordinate):Array<Coordinate> {

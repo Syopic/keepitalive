@@ -30,10 +30,10 @@ class GameView extends Object {
 	public var selectedUnit:BaseUnit;
 	public var pathView:PathView;
 	public var units:Array<BaseUnit> = new Array<BaseUnit>();
+	public var interaction:Interactive;
 
 	var container:Object;
 	var ps:ParticleSystem;
-	var interaction:Interactive;
 	var bgTiledGroup:TileGroup;
 
 	public function new(parent:Object) {
@@ -47,42 +47,45 @@ class GameView extends Object {
 		// var tile = hxd.Res.img.concept.toTile();
 		// var bgImage = new Bitmap(tile, camera);
 		bgTiledGroup = new TileGroup(Game.mapDataStorage.tileImage, camera);
-		drawMap();
-
+		
 		bgTiledGroup.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
-
+		
 		uiContainer = new Object(camera);
-
+		
 		cursor = new GameCursor(camera);
-
-		var interaction = new Interactive(Game.mapDataStorage.mapWidth * Globals.CELL_SIZE, Game.mapDataStorage.mapHeight * Globals.CELL_SIZE, camera);
+		
+		drawMap();
+		interaction = new Interactive(Game.mapDataStorage.mapWidth * Globals.CELL_SIZE, Game.mapDataStorage.mapHeight * Globals.CELL_SIZE, camera);
 		interaction.propagateEvents = true;
 		interaction.cursor = Cursor.Default;
 		interaction.onClick = function(event:hxd.Event) {
-			if (selectedUnit != null) {
-				var c = Utils.getCoord(event.relX, event.relY);
-				var path = Game.mapDataStorage.findPath(selectedUnit.getCoordinate(), c);
-				pathView.clearPath();
-				selectedUnit.position = new Point(c.x * Globals.CELL_SIZE, c.y * Globals.CELL_SIZE);
-				clearUnitSelection();
+			if (!Game.controller.isLocked) {
+				if (selectedUnit != null) {
+					var c = Utils.getCoord(event.relX, event.relY);
+					var path = Game.mapDataStorage.findPath(selectedUnit.getCoordinate(), c);
+					pathView.clearPath();
+					// selectedUnit.position = new Point(c.x * Globals.CELL_SIZE, c.y * Globals.CELL_SIZE);
+					selectedUnit.setPath(path);
+					clearUnitSelection();
+				}
 			}
 		}
-
 
 		interaction.onMove = function(event:hxd.Event) {
-			var c = Utils.getCoord(event.relX, event.relY);
-			if (selectedUnit != null) {
-				var path = Game.mapDataStorage.findPath(selectedUnit.getCoordinate(), c);
-				pathView.drawPath(path);
-			}
+			if (!Game.controller.isLocked) {
+				var c = Utils.getCoord(event.relX, event.relY);
+				if (selectedUnit != null) {
+					var path = Game.mapDataStorage.findPath(selectedUnit.getCoordinate(), c);
+					pathView.drawPath(path);
+				}
 
-			var t = Game.mapDataStorage.getTileItem(c.x, c.y, 0);
-			// if (t != null)
-			// 	trace(t.type);
-			cursor.setPosition(c.x * Globals.CELL_SIZE, c.y * Globals.CELL_SIZE);
+				var t = Game.mapDataStorage.getTileItem(c.x, c.y, 0);
+				// if (t != null)
+				// 	trace(t.type);
+				cursor.setPosition(c.x * Globals.CELL_SIZE, c.y * Globals.CELL_SIZE);
+			}
 		}
 	}
-
 
 	public function drawMap() {
 		for (y in 0...Game.mapDataStorage.mapHeight) {
@@ -109,23 +112,17 @@ class GameView extends Object {
 	}
 
 	public function update(dt:Float) {
+		Game.mapDataStorage.updateWalkableMap();
 		for (unit in units) {
-			if (unit != null) {
-				// obj.position.x += 0.1;
-				unit.update(dt);
-				Game.uiManager.hudScreen.setScore(Std.int(unit.position.x));
-				// ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + 2), Std.int(unit.position.y), Globals.COLOR_SET.Como));
-				if (unit.position.x > Globals.STAGE_WIDTH) {
-					unit.position.x = 0;
-					unit.position.y = Std.random(144);
-				}
-			}
+			unit.update(dt);
+			if (unit != selectedUnit)
+			Game.mapDataStorage.setWalkable(unit.getCoordinate().x, unit.getCoordinate().y, false);
 		}
 		Game.controller.checkGame();
 		if (ps != null) {
 			ps.update(dt);
 		}
-		
+
 		camera.update(dt);
 	}
 
@@ -134,6 +131,8 @@ class GameView extends Object {
 		selectedUnit = unit;
 		unit.select(true);
 	}
+
+	public function moveUnit(unit:BaseUnit, path:Array<Coordinate>) {}
 
 	public function clearUnitSelection() {
 		for (unit in units) {
