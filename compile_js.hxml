@@ -1,0 +1,9 @@
+-cp src
+-lib heaps
+-lib domkit
+-lib tweenx
+-lib tweenxcore
+-js out/ld.js
+-main ld.Game
+-D windowSize=640x576
+-D windowTitle=Keep It Alive
