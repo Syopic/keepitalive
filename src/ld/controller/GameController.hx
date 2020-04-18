@@ -12,9 +12,13 @@ class GameController {
 	}
 
 	public function startGame() {
-		Game.view.dispose();
 		Game.view.init();
+		Game.inputController = new InputController();
 		this.isPause = false;
+	}
+
+	public function endGame() {
+		Game.view.dispose();
 	}
 
 	public function pause(isPause:Bool) {
@@ -26,5 +30,9 @@ class GameController {
 			Game.view.update(dt);
 	}
 
-	public function dispose() {}
+	public function dispose() {
+		Game.view.dispose();
+		Game.inputController.dispose();
+		Game.inputController = null;
+	}
 }

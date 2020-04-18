@@ -26,6 +26,7 @@ class UIManager extends Object {
 
 	public var briefComp:BriefComp;
 
+
 	var muteSoundBtn:MuteSoundButton;
 
 	public var hudScreen:HUDScreen;
@@ -47,7 +48,7 @@ class UIManager extends Object {
 		muteSoundBtn.setPosition(144, 8);
 		transitionView = new TransitionView(this);
 		if (Globals.skipMainMenu) {
-			changeScreen(Globals.LEVELSELECT_SCREEN, true);
+			changeScreen(Globals.HUD_SCREEN, true);
 		} else
 			changeScreen(Globals.TITLE_SCREEN, true);
 	}
@@ -67,6 +68,7 @@ class UIManager extends Object {
 				gameOverScreen.remove();
 			}
 			if (hudScreen != null) {
+				Game.controller.endGame();
 				hudScreen.dispose();
 				hudScreen.remove();
 			}
@@ -102,8 +104,8 @@ class UIManager extends Object {
 						Game.soundManager.stopSound(Globals.MUSIC_SET.TitleTheme);
 						Game.controller.startGame();
 						// showBrief();
-						showTextBlob(30, 30, "MOCK\nMOCLOCK", 4200);
-						Game.soundManager.playSound(Globals.MUSIC_SET.TitleTheme, 0.6, true, true);
+						// showTextBlob(30, 30, "MOCK\nMOCLOCK", 4200);
+						// Game.soundManager.playSound(Globals.MUSIC_SET.TitleTheme, 0.6, true, true);
 						hudScreen = new HUDScreen(screenContainer);
 					}
 			}
@@ -114,9 +116,9 @@ class UIManager extends Object {
 		hideBrief();
 		if (briefComp == null) {
 			briefComp = new BriefComp();
-			briefComp.addMessage({img: Res.img.textBlobHeroLeft.toTile(), text: "What the...?\nIm surrounded!\nthird textline", isLeft: true});
-			briefComp.addMessage({img: Res.img.textBlobHeroRight.toTile(), text: "Ho.. ho.. ho..!\nIm superman!", isLeft: false});
-			briefComp.addMessage({img: Res.img.textBlobHeroRight.toTile(), text: "GOOD BYE!", isLeft: false});
+			// briefComp.addMessage({img: Res.img.textBlobHeroLeft.toTile(), text: "What the...?\nIm surrounded!\nthird textline", isLeft: true});
+			// briefComp.addMessage({img: Res.img.textBlobHeroRight.toTile(), text: "Ho.. ho.. ho..!\nIm superman!", isLeft: false});
+			// briefComp.addMessage({img: Res.img.textBlobHeroRight.toTile(), text: "GOOD BYE!", isLeft: false});
 			inGameContainer.addChild(briefComp);
 			briefComp.start();
 		}

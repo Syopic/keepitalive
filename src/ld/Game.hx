@@ -4,6 +4,7 @@ import ld.data.MapDataStorage;
 import ld.utils.shaders.OverlayTexture;
 import ld.data.Globals;
 import ld.controller.GameController;
+import ld.controller.InputController;
 import ld.view.UIManager;
 import ld.view.GameView;
 import ld.sound.SoundManager;
@@ -13,11 +14,13 @@ import ld.utils.console.ConsoleController;
 class Game extends hxd.App {
 	public static var instance:Game;
 	public static var controller:GameController;
+	public static var inputController:InputController;
 	public static var uiManager:UIManager;
 	public static var view:GameView;
 	public static var soundManager:SoundManager;
 	public static var debugPanel:DebugPanel;
 	public static var mapDataStorage:MapDataStorage;
+
 
 	static function main() {
 		hxd.Res.initEmbed();

@@ -47,7 +47,7 @@ class MapDataStorage {
 		return tiledMapData.layers[layer].data[x + y * mapWidth];
 	}
 
-	public function getObjects(layer:Int = 2):Array<MapObject> {
+	public function getObjects(layer:Int = 1):Array<MapObject> {
 		return tiledMapData.layers[layer].objects;
 	}
 
