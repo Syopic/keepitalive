@@ -12,15 +12,18 @@ class GameController {
 	public var isLocked:Bool = false;
 	public var steps:Int = 0;
 
-	public function new() {
-		mapDataStorage = new MapDataStorage(hxd.Res.map);
-	}
+	public function new() {}
 
-	public function startGame() {
+	public function startGame(level:Int = 1) {
+		switch(level) {
+			case 1: mapDataStorage = new MapDataStorage(hxd.Res.map1);
+			case 2: mapDataStorage = new MapDataStorage(hxd.Res.map);
+		}
+		Game.mapDataStorage = mapDataStorage;
 		Game.view.init();
 		Game.inputController = new InputController();
 		this.isPause = false;
-		steps =0;
+		steps = 0;
 	}
 
 	public function lockInput(isLock:Bool) {
@@ -52,10 +55,11 @@ class GameController {
 		var result:Bool = false;
 		var c = unit.getCoordinate();
 		var ti = Game.mapDataStorage.getTileItem(c.x, c.y, 0);
-		if (ti!= null && ti.type == Std.string(CellType.Trap)) {
+		if (ti != null && ti.type == Std.string(CellType.Trap)) {
 			unit.wound(2);
-			for (i in 0 ... 30)
-			Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2), Std.int(unit.position.y + Globals.CELL_SIZE / 2), Globals.COLOR_SET.Como));
+			for (i in 0...30)
+				Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2),
+					Std.int(unit.position.y + Globals.CELL_SIZE / 2), Globals.COLOR_SET.Como));
 			result = true;
 		}
 
@@ -67,7 +71,7 @@ class GameController {
 	}
 
 	public function update(dt:Float) {
-		if (!this.isPause && Game.view != null)
+		if (!this.isPause && Game.view != null && mapDataStorage != null)
 			Game.view.update(dt);
 	}
 

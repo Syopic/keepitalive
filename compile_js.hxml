@@ -7,4 +7,4 @@
 -js out/ld.js
 -main ld.Game
 -D windowSize=640x576
--D windowTitle=Keep It Alive
+-D windowTitle=Let's stick together

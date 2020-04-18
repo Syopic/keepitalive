@@ -56,11 +56,9 @@ class GameView extends Object {
 		ps = new ParticleSystem();
 
 		bgTiledGroup = new TileGroup(Game.mapDataStorage.tileImage, camera);
-
 		bgTiledGroup.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
-
-
 		drawMap();
+
 		interaction = new Interactive(Game.mapDataStorage.mapWidth * Globals.CELL_SIZE, Game.mapDataStorage.mapHeight * Globals.CELL_SIZE, camera);
 		interaction.propagateEvents = true;
 		interaction.cursor = Cursor.Default;

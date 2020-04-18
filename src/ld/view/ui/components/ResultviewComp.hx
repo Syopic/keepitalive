@@ -19,7 +19,7 @@ class ResultviewComp extends h2d.Flow implements h2d.domkit.Object {
     static var SRC = <resultview>
 		<flow vertical id="menu"> 
 			<menubutton("RESTART", onRestart, clearAll) public id="restartButton" />
-			<menubutton("NEXT LEVEL", onRestart, clearAll) public id="nextLevelButton" />
+			<menubutton("NEXT LEVEL", onNextLevel, clearAll) public id="nextLevelButton" />
 			<menubutton("MAIN MENU", onMainmenu, clearAll) public id="mainMenuButton" />
 		</flow>
 	</resultview>;
@@ -39,6 +39,8 @@ class ResultviewComp extends h2d.Flow implements h2d.domkit.Object {
 	public dynamic function onNextLevel() {
 		trace("onNextLevel");
 		clearAll();
+		Game.uiManager.selectedLevel ++;
+		Game.uiManager.changeScreen(Globals.HUD_SCREEN);
 	}
 
 	public dynamic function onMainmenu() {

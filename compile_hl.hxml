@@ -8,5 +8,5 @@
 -hl out/hlboot.dat
 -main ld.Game
 -D windowSize=640x576
--D windowTitle=Keep It Alive
+-D windowTitle=Let's stick together
 -D heaps_enable_hl_mp3=true

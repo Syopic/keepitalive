@@ -36,6 +36,7 @@ class UIManager extends Object {
 
 	public var currentScreen:String = "";
 	public var textBlobs:Map<String, TextBlob>;
+	public var selectedLevel:Int = 1;
 
 	public function new(parent:Object) {
 		super(parent);
@@ -102,7 +103,7 @@ class UIManager extends Object {
 				case Globals.HUD_SCREEN:
 					{
 						Game.soundManager.stopSound(Globals.MUSIC_SET.TitleTheme);
-						Game.controller.startGame();
+						Game.controller.startGame(selectedLevel);
 						// showBrief();
 						// showTextBlob(30, 30, "MOCK\nMOCLOCK", 4200);
 						// Game.soundManager.playSound(Globals.MUSIC_SET.TitleTheme, 0.6, true, true);

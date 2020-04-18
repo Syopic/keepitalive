@@ -61,7 +61,7 @@ class LevelSelectScreen extends h2d.Object {
 	}
 
 	function onLevelSelect(level:Int) {
-		trace(level);
+		Game.uiManager.selectedLevel = level;
 		Game.uiManager.changeScreen(Globals.HUD_SCREEN);
 	}
 

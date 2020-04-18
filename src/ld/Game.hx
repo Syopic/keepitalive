@@ -31,7 +31,7 @@ class Game extends hxd.App {
 		soundManager = new SoundManager();
 		// soundManager.playSound(Globals.MUSIC_SET.TitleTheme);
 		controller = new GameController();
-		mapDataStorage = controller.mapDataStorage;
+		
 		view = new GameView(s2d);
 		uiManager = new UIManager(s2d);
 		var ot = new OverlayTexture(4);
