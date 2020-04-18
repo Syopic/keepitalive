@@ -9,13 +9,13 @@ class ParticleHelper {
 			y: y,
 			friction: 0,
 			velocity: 0.4,
-			lifetime: 0.5,
-			gravity: 10,
+			lifetime: 1,
+			gravity: 30,
 			color: color,
 			forceX: 0,
 			forceY: -1,
 			forceRandomRange: 1,
-			lifetimeRandomRange: 0.3
+			lifetimeRandomRange: 0.5
 		}
 		return options;
 	}

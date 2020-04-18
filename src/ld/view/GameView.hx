@@ -1,5 +1,6 @@
 package ld.view;
 
+import ld.controller.GameController;
 import ld.view.ui.DotView;
 import ld.utils.Utils;
 import pathfinder.Coordinate;
@@ -34,9 +35,9 @@ class GameView extends Object {
 	public var units:Array<BaseUnit> = new Array<BaseUnit>();
 	public var interaction:Interactive;
 	public var dots:Array<DotView>;
+	public var ps:ParticleSystem;
 
 	var container:Object;
-	var ps:ParticleSystem;
 	var bgTiledGroup:TileGroup;
 
 	public function new(parent:Object) {
@@ -50,6 +51,9 @@ class GameView extends Object {
 		dispose();
 		// var tile = hxd.Res.img.concept.toTile();
 		// var bgImage = new Bitmap(tile, camera);
+		dotsContainer = new Object(camera);
+		ps = new ParticleSystem();
+
 		bgTiledGroup = new TileGroup(Game.mapDataStorage.tileImage, camera);
 
 		bgTiledGroup.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
@@ -57,6 +61,7 @@ class GameView extends Object {
 		uiContainer = new Object(camera);
 
 		cursor = new GameCursor(camera);
+		cursor.visible = false;
 
 		drawMap();
 		interaction = new Interactive(Game.mapDataStorage.mapWidth * Globals.CELL_SIZE, Game.mapDataStorage.mapHeight * Globals.CELL_SIZE, camera);
@@ -75,6 +80,8 @@ class GameView extends Object {
 						var path = Game.mapDataStorage.findPath(selectedUnit.getCoordinate(), c);
 						pathView.clearPath();
 						selectedUnit.setPath(path);
+						Game.controller.steps ++;
+						Game.uiManager.hudScreen.setScore(Game.controller.steps);
 					}
 					clearUnitSelection();
 				}
@@ -83,6 +90,7 @@ class GameView extends Object {
 
 		interaction.onMove = function(event:hxd.Event) {
 			if (!Game.controller.isLocked) {
+				cursor.visible = true;
 				var c = Utils.getCoord(event.relX, event.relY);
 				if (selectedUnit != null) {
 					// FIND IN DOTS
@@ -98,11 +106,10 @@ class GameView extends Object {
 						pathView.clearPath();
 				}
 
-				var t = Game.mapDataStorage.getTileItem(c.x, c.y, 0);
-			
 				cursor.setPosition(c.x * Globals.CELL_SIZE, c.y * Globals.CELL_SIZE);
-			}
+			} else cursor.visible = false;
 		}
+		camera.addChild(ps);
 	}
 
 	public function drawMap() {
@@ -143,7 +150,7 @@ class GameView extends Object {
 	}
 
 	public function addDot(c:Coordinate) {
-		var dot = new DotView(uiContainer);
+		var dot = new DotView(dotsContainer);
 		dot.position = new Point((c.x) * Globals.CELL_SIZE, c.y * Globals.CELL_SIZE);
 		dots.push(dot);
 		dot.update(0);
@@ -188,8 +195,12 @@ class GameView extends Object {
 	}
 
 	public function dispose() {
-		if (camera != null)
+		if (camera != null) {
+
 			camera.removeChildren();
+			camera.viewX = Globals.STAGE_WIDTH / 2;
+			camera.viewY = Globals.STAGE_HEIGHT / 2;
+		}
 		if (bgTiledGroup != null)
 			bgTiledGroup.removeChildren();
 
@@ -211,6 +222,7 @@ class GameView extends Object {
 		Game.mapDataStorage.updateWalkableMap();
 		for (unit in units) {
 			unit.update(dt);
+			if (!unit.checked) Game.controller.checkTrap(unit);
 			if (unit != selectedUnit)
 				Game.mapDataStorage.setWalkable(unit.getCoordinate().x, unit.getCoordinate().y, false);
 		}

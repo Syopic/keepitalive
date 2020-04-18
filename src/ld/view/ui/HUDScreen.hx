@@ -53,24 +53,32 @@ class HUDScreen extends h2d.Object {
 		resultFlow.verticalSpacing = 5;
 		resultFlow.layout = Vertical;
 
-		resultFlow.paddingTop = 70;
+		resultFlow.paddingTop = 80;
 		resultFlow.paddingLeft = 32;
 
 		menuView = new GamemenuviewComp(panelFlow);
 		Game.uiManager.style.addObject(menuView);
 		
-
 		winTF = new Text(Res.font.gb.toFont());
+		scoreTF = new Text(Res.font.gb.toFont());
 		
-		winTF.setScale(2);
 		winTF.textColor = Globals.COLOR_SET.Como;
 		winTF.text = "LEVEL\nCOMPLETE";
 		winTF.textAlign = Center;
-		winTF.setPosition(84, 20);
+		winTF.setPosition(81, 30);
 		this.addChild(winTF);
+		scoreTF.textColor = Globals.COLOR_SET.Como;
+		scoreTF.text = "0";
+		scoreTF.textAlign = Left;
+		scoreTF.setPosition(19, 5);
+		this.addChild(scoreTF);
+		scoreTF.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
 		winTF.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
+
+
 		resultView = new ResultviewComp(resultFlow);
 		Game.uiManager.style.addObject(resultView);
+
 
 
 		panelFlow.visible = false;
@@ -87,6 +95,7 @@ class HUDScreen extends h2d.Object {
 	public function pause() {
 		panelFlow.visible = !panelFlow.visible;
 		tint.visible = panelFlow.visible;
+		scoreTF.visible = !panelFlow.visible;
 		Game.controller.pause(panelFlow.visible);
 		if (!panelFlow.visible) {
 			menuView.clearAll();
@@ -97,13 +106,15 @@ class HUDScreen extends h2d.Object {
 	}
 
 	public function showResult() {
+		winTF.text = "LEVEL COMPLETE\n\nSTEPS: " + scoreTF.text ;
 		resultFlow.visible = true;
 		winTF.visible = true;
+		scoreTF.visible = false;
 		tint.visible = true;
 	}
 
 	public function setScore(value:Int) {
-		// scoreTF.text = value + "";
+		scoreTF.text = value + "";
 	}
 
 	function onEvent(event:hxd.Event) {
@@ -141,7 +152,9 @@ class HUDScreen extends h2d.Object {
 		panelFlow.visible = false;
 		resultFlow.visible = false;
 		winTF.visible = false;
+		scoreTF.visible = false;
 		tint.visible = false;
+		scoreTF.text = "0";
 		Game.view.dispose();
 	}
 }

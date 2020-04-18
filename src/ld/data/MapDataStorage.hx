@@ -57,7 +57,7 @@ class MapDataStorage {
 			for (x in 0...mapWidth) {
 				var tid = getTileId(x, y, 0);
 				var tidd = getTileItem(x, y, 0);
-				mapData.setWalkable(x, y, tid == 0 || tidd.type == Std.string(CellType.WinTarget));
+				mapData.setWalkable(x, y, tid == 0 || tidd.type == Std.string(CellType.WinTarget) || tidd.type == Std.string(CellType.Trap));
 			}
 		}
 	}
@@ -122,7 +122,8 @@ class MapDataStorage {
 
 	public function getTileItem(x:Int, y:Int, layer:Int = 0):TileItem {
 		var tid = tiledMapData.layers[0].data[x + y * mapWidth];
-		return tileSet.tiles[tid - 1];
+		
+		return getTileItemById(tid);
 	}
 }
 enum UnitType {
@@ -134,8 +135,8 @@ enum UnitType {
 enum CellType {
 	Wall;
 	WinTarget;
+	Trap;
 }
-
 
 typedef TiledMapData = {
 	var layers:Array<TiledMapLayer>;

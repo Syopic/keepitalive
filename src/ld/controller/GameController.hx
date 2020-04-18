@@ -1,5 +1,8 @@
 package ld.controller;
 
+import ld.data.Globals;
+import ld.utils.particles.ParticleHelper;
+import ld.view.unit.BaseUnit;
 import ld.data.MapDataStorage;
 
 class GameController {
@@ -7,6 +10,7 @@ class GameController {
 
 	public var isPause:Bool = false;
 	public var isLocked:Bool = false;
+	public var steps:Int = 0;
 
 	public function new() {
 		mapDataStorage = new MapDataStorage(hxd.Res.map);
@@ -16,6 +20,7 @@ class GameController {
 		Game.view.init();
 		Game.inputController = new InputController();
 		this.isPause = false;
+		steps =0;
 	}
 
 	public function lockInput(isLock:Bool) {
@@ -41,6 +46,20 @@ class GameController {
 					}
 				}
 		}
+	}
+
+	public function checkTrap(unit:BaseUnit):Bool {
+		var result:Bool = false;
+		var c = unit.getCoordinate();
+		var ti = Game.mapDataStorage.getTileItem(c.x, c.y, 0);
+		if (ti!= null && ti.type == Std.string(CellType.Trap)) {
+			unit.wound(2);
+			for (i in 0 ... 30)
+			Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2), Std.int(unit.position.y + Globals.CELL_SIZE / 2), Globals.COLOR_SET.Como));
+			result = true;
+		}
+
+		return result;
 	}
 
 	public function pause(isPause:Bool) {

@@ -45,7 +45,7 @@ class UIManager extends Object {
 		inGameContainer = new Object(this);
 		screenContainer = new Object(this);
 		muteSoundBtn = new MuteSoundButton(this);
-		muteSoundBtn.setPosition(144, 8);
+		muteSoundBtn.setPosition(146, 6);
 		transitionView = new TransitionView(this);
 		if (Globals.skipMainMenu) {
 			changeScreen(Globals.HUD_SCREEN, true);

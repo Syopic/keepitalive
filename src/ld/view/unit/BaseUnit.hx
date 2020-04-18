@@ -1,5 +1,8 @@
 package ld.view.unit;
 
+import ld.utils.particles.ParticleSystem.ParticleOptions;
+import ld.utils.particles.ParticleSystem.EmitterOptions;
+import ld.utils.particles.ParticleEmitter;
 import h2d.col.Point;
 import pathfinder.Coordinate;
 import ld.data.MapDataStorage.TileItem;
@@ -15,20 +18,41 @@ import ld.view.base.GameObject;
 class BaseUnit extends GameObject {
 	public var tileItem:TileItem;
 	public var selected:Bool = false;
+	public var checked:Bool = false;
 
 	var selection:Bitmap;
 	var bitmap:Bitmap;
 	var textBlobId:String;
     var selectDelay:Float = 0;
-    var moveDelay:Float = 0;
+    public var moveDelay:Float = 0;
     var path:Array<Coordinate> = null;
+    var hp:Int = 10;
+    var pe:ParticleEmitter;
 
 	public function new(tileItem:TileItem, ?parent:Object) {
 		super(parent);
 		this.tileItem = tileItem;
 		selection = new Bitmap(Game.controller.mapDataStorage.getTileById(72), this);
-		select(false);
-
+        select(false);
+        var pOption:ParticleOptions = {
+			forceX: 0,
+			forceY: -0.7,
+			velocity: 1,
+			gravity: 50,
+			lifetime: 0.2,
+			color: 0xff0000,
+			forceRandomRange: 0.5,
+			lifetimeRandomRange: 0.2
+		}
+        var eOption:EmitterOptions = {
+			x: 50,
+			y: 50,
+			rate: 1000,
+			duration: 200,
+			positionRange: 1
+		}
+        pe = Game.view.ps.addEmitter(eOption, pOption);
+        
 		var interaction = new Interactive(16, 16, this);
         interaction.cursor = Cursor.Button;
 		interaction.onOver = function(event:hxd.Event) {
@@ -60,6 +84,12 @@ class BaseUnit extends GameObject {
     
     public function setPath(path:Array<Coordinate> ) {
 		this.path = path;
+    }
+    
+    public function wound(hp:Int) {
+        this.hp -= hp;
+        checked = true;
+        moveDelay = 0.5;
 	}
 
 	override function update(dt:Float) {
@@ -77,10 +107,12 @@ class BaseUnit extends GameObject {
         if (this.path != null && path.length > 0) {
             moveDelay -= dt;
             if (moveDelay < 0) {
-                moveDelay = 0.01;
+                moveDelay = 0.06;
                 var nC = path.shift();
+                checked = false;
                 position = new Point(nC.x * Globals.CELL_SIZE, nC.y * Globals.CELL_SIZE);
             }
         }
+        pe.position = new Point(position.x + Globals.CELL_SIZE / 2, position.y + Globals.CELL_SIZE / 3);
 	}
 }

@@ -13,7 +13,7 @@ class ParticleSystem extends h2d.Object {
 	var sbMap:Map<Int, SpriteBatch>;
 	var container:Object;
 
-	public function new(parent) {
+	public function new(?parent) {
 		super(parent);
 		sbMap = new Map<Int, SpriteBatch>();
 		emitters = new Array<ParticleEmitter>();

@@ -24,7 +24,7 @@ class TitleScreen extends h2d.Object {
 
 		panelFlow.verticalSpacing = 5;
 
-		panelFlow.paddingTop = 80;
+		panelFlow.paddingTop = 90;
 		panelFlow.paddingLeft = 32;
 
 		menuView = new MenuviewComp(panelFlow);
@@ -32,6 +32,7 @@ class TitleScreen extends h2d.Object {
 		hxd.Window.getInstance().addEventTarget(onEvent);
 	}
 
+	
 	function onEvent(event:hxd.Event) {
 		// keyboard
 		if (event.kind == EKeyDown) {
