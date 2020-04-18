@@ -42,7 +42,6 @@ class BaseUnit extends GameObject {
 		interaction.onOut = function(event:hxd.Event) {
 			if (!Game.controller.isLocked) {
                 Game.view.interaction.cursor = Cursor.Default;
-
 				bitmap.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
 				// Game.uiManager.hideTextBlob(textBlobId);
 			}
@@ -63,10 +62,6 @@ class BaseUnit extends GameObject {
 		this.path = path;
 	}
 
-	public function getCoordinate():Coordinate {
-		return new Coordinate(Std.int(position.x / Globals.CELL_SIZE), Std.int(position.y / Globals.CELL_SIZE));
-	}
-
 	override function update(dt:Float) {
 		super.update(dt);
 		if (selected) {
@@ -78,7 +73,7 @@ class BaseUnit extends GameObject {
 			selection.visible = false;
 			selectDelay = 0;
         }
-        
+
         if (this.path != null && path.length > 0) {
             moveDelay -= dt;
             if (moveDelay < 0) {

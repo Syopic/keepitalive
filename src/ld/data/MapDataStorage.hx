@@ -18,10 +18,12 @@ class MapDataStorage {
 
 	private var tiledMapData:TiledMapData;
 	private var mapData:MapData;
+	private var checkMapData:MapData;
 	
     private var tileSet:TiledMapSet;
 	private var tiles:Array<Tile>;
 	private var pathFinder:Pathfinder;
+	private var unitPathFinder:Pathfinder;
 
 	public function new(mapData:Resource) {
 		tileImage = hxd.Res.img.tileSet.toTile();
@@ -43,16 +45,32 @@ class MapDataStorage {
 		];
 		
 		mapData = new MapData(mapWidth, mapHeight);
+		checkMapData = new MapData(mapWidth, mapHeight);
 
 		updateWalkableMap();
 		pathFinder = new Pathfinder(mapData);
+		unitPathFinder = new Pathfinder(checkMapData);
 	}
 
 	public function updateWalkableMap() {
 		for (y in 0...mapHeight) {
 			for (x in 0...mapWidth) {
 				var tid = getTileId(x, y, 0);
-				mapData.setWalkable(x, y, tid == 0);
+				var tidd = getTileItem(x, y, 0);
+				mapData.setWalkable(x, y, tid == 0 || tidd.type == Std.string(CellType.WinTarget));
+			}
+		}
+	}
+
+	public function updateCheckMap(coords:Array<Coordinate>) {
+		for (y in 0...mapHeight) {
+			for (x in 0...mapWidth) {
+				checkMapData.setWalkable(x, y, false);
+				for (c in coords) {
+					if (c.x == x && c.y == y) {
+						checkMapData.setWalkable(x, y, true);
+					}
+				}
 			}
 		}
 	}
@@ -60,9 +78,17 @@ class MapDataStorage {
 	public function setWalkable(x:Int, y:Int, value:Bool) {
 		mapData.setWalkable(x, y, value);
 	}
+
+	public function isWalkable(x:Int, y:Int) {
+		return mapData.isWalkable(x, y);
+	}
 	
 	public function findPath(from:Coordinate, to:Coordinate):Array<Coordinate> {
 		return pathFinder.createPath(from, to, EHeuristic.PRODUCT, false, true);
+	}
+
+	public function unitFindPath(from:Coordinate, to:Coordinate):Array<Coordinate> {
+		return unitPathFinder.createPath(from, to, EHeuristic.PRODUCT, false, true);
 	}
     
     public function getTileById(id:Int):Tile {

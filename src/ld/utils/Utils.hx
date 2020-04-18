@@ -46,6 +46,25 @@ class Utils {
 	}
 
 	public static function getCoord(x:Float, y:Float):Coordinate {
-		return new Coordinate(Std.int(x / Globals.CELL_SIZE), Std.int(y / Globals.CELL_SIZE)) ;
+		return new Coordinate(Std.int(x / Globals.CELL_SIZE), Std.int(y / Globals.CELL_SIZE));
+	}
+
+	public static function getDistanceCoord(coordinate1:Coordinate, coordinate2:Coordinate):Float {
+		var dx = Math.abs(coordinate1.x - coordinate2.x);
+		var dy = Math.abs(coordinate1.y - coordinate2.y);
+
+		return Math.sqrt(dx * dx + dy * dy);
+	}
+
+	public static var checkMap:Map<Coordinate, Bool> = new Map<Coordinate, Bool>();
+	public static function checkRecursive(c:Coordinate, array:Array<Coordinate>):Bool {
+		for (a in array) {
+			if (getDistanceCoord(c, a) == 1) {
+				checkMap[c]  = true;
+				return checkRecursive(a, array);
+				return true;
+			}
+		}
+		return false;
 	}
 }
