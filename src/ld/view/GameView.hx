@@ -1,5 +1,6 @@
 package ld.view;
 
+import ld.data.MapDataStorage.UnitType;
 import ld.controller.GameController;
 import ld.view.ui.DotView;
 import ld.utils.Utils;
@@ -58,10 +59,6 @@ class GameView extends Object {
 
 		bgTiledGroup.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
 
-		uiContainer = new Object(camera);
-
-		cursor = new GameCursor(camera);
-		cursor.visible = false;
 
 		drawMap();
 		interaction = new Interactive(Game.mapDataStorage.mapWidth * Globals.CELL_SIZE, Game.mapDataStorage.mapHeight * Globals.CELL_SIZE, camera);
@@ -71,18 +68,26 @@ class GameView extends Object {
 			if (!Game.controller.isLocked) {
 				if (selectedUnit != null) {
 					var c = Utils.getCoord(event.relX, event.relY);
-					var isFree:Bool = false;
-					for (d in dots) {
-						if (d.getCoordinate().isEqualTo(c))
-							isFree = true;
+					var unit = getUnitByCoord(c.x, c.y);
+					if (unit != null && unit.tileItem.type == Std.string(UnitType.Stone)) {
+						if (Utils.getDistanceCoord(unit.getCoordinate(), selectedUnit.getCoordinate()) == 1)
+							moveStone(unit, selectedUnit.getCoordinate());
+						cursor.setMode(CursorMode.Default);
+					} else {
+						var isFree:Bool = false;
+						for (d in dots) {
+							if (d.getCoordinate().isEqualTo(c))
+								isFree = true;
+						}
+						if (isFree) {
+							var path = Game.mapDataStorage.findPath(selectedUnit.getCoordinate(), c);
+							pathView.clearPath();
+							selectedUnit.setPath(path);
+							Game.controller.steps++;
+							Game.uiManager.hudScreen.setScore(Game.controller.steps);
+						}
 					}
-					if (isFree) {
-						var path = Game.mapDataStorage.findPath(selectedUnit.getCoordinate(), c);
-						pathView.clearPath();
-						selectedUnit.setPath(path);
-						Game.controller.steps ++;
-						Game.uiManager.hudScreen.setScore(Game.controller.steps);
-					}
+
 					clearUnitSelection();
 				}
 			}
@@ -91,24 +96,38 @@ class GameView extends Object {
 		interaction.onMove = function(event:hxd.Event) {
 			if (!Game.controller.isLocked) {
 				cursor.visible = true;
+				cursor.setMode(CursorMode.Default);
 				var c = Utils.getCoord(event.relX, event.relY);
 				if (selectedUnit != null) {
-					// FIND IN DOTS
-					var isFree:Bool = false;
-					for (d in dots) {
-						if (d.getCoordinate().isEqualTo(c))
-							isFree = true;
+					var unit = getUnitByCoord(c.x, c.y);
+					if (unit != null && unit.tileItem.type == Std.string(UnitType.Stone)) {
+						if (Utils.getDistanceCoord(unit.getCoordinate(), selectedUnit.getCoordinate()) == 1)
+							cursor.setMode(CursorMode.Push);
+
+							// moveStone(unit, selectedUnit.getCoordinate());
+					} else {
+						// FIND IN DOTS
+						var isFree:Bool = false;
+						for (d in dots) {
+							if (d.getCoordinate().isEqualTo(c))
+								isFree = true;
+						}
+						if (isFree) {
+							var path = Game.mapDataStorage.findPath(selectedUnit.getCoordinate(), c);
+							pathView.drawPath(path);
+						} else
+							pathView.clearPath();
 					}
-					if (isFree) {
-						var path = Game.mapDataStorage.findPath(selectedUnit.getCoordinate(), c);
-						pathView.drawPath(path);
-					} else
-						pathView.clearPath();
 				}
 
 				cursor.setPosition(c.x * Globals.CELL_SIZE, c.y * Globals.CELL_SIZE);
-			} else cursor.visible = false;
+			} else
+				cursor.visible = false;
 		}
+		uiContainer = new Object(camera);
+
+		cursor = new GameCursor(uiContainer);
+		cursor.visible = false;
 		camera.addChild(ps);
 	}
 
@@ -124,7 +143,6 @@ class GameView extends Object {
 		var mapObjects = Game.mapDataStorage.getObjects();
 
 		for (obj in mapObjects) {
-			// 	// sandTiledGroup.add(obj.x, obj.y - obj.height, tiles[obj.gid - 1]);
 			var tile = Game.mapDataStorage.getTileItemById(obj.gid);
 			var unit:BaseUnit = UnitsFactory.getUnitByTileItem(tile);
 			if (unit != null) {
@@ -173,15 +191,17 @@ class GameView extends Object {
 		testC = new Array<Coordinate>();
 		testC.push(dotCoordinate);
 		for (n in units) {
-			if (!sc.isEqualTo(n.getCoordinate())) // remove selected Unit
+			if (!sc.isEqualTo(n.getCoordinate()) && n.tileItem.type != Std.string(UnitType.Stone)) {
+				// trace(n.tileItem.type);
 				testC.push(n.getCoordinate());
+			}
 		}
 		Game.mapDataStorage.updateCheckMap(testC); // map with units as Walkable
 
 		var isValid:Bool = true;
 
 		for (n in units) {
-			if (!sc.isEqualTo(n.getCoordinate())) {
+			if (!sc.isEqualTo(n.getCoordinate()) && n.tileItem.type != Std.string(UnitType.Stone)) {
 				var path = Game.mapDataStorage.unitFindPath(dotCoordinate, n.getCoordinate());
 				if (path == null)
 					isValid = false;
@@ -194,9 +214,27 @@ class GameView extends Object {
 			addDot(dotCoordinate);
 	}
 
+	public function moveStone(unit:BaseUnit, from:Coordinate) {
+		var c = unit.getCoordinate();
+		var dx = c.x - from.x;
+		var dy = c.y - from.y;
+		if (Game.mapDataStorage.isWalkable(c.x + dx, c.y + dy)) {
+			var path = [new Coordinate(c.x + dx, c.y + dy)];
+			unit.setPath(path);
+		}
+	}
+
+	public function getUnitByCoord(x:Int, y:Int) {
+		for (unit in units) {
+			var c = unit.getCoordinate();
+			if (c.isEqualTo(new Coordinate(x, y)))
+				return unit;
+		}
+		return null;
+	}
+
 	public function dispose() {
 		if (camera != null) {
-
 			camera.removeChildren();
 			camera.viewX = Globals.STAGE_WIDTH / 2;
 			camera.viewY = Globals.STAGE_HEIGHT / 2;
@@ -223,7 +261,8 @@ class GameView extends Object {
 		Game.mapDataStorage.updateWalkableMap();
 		for (unit in units) {
 			unit.update(dt);
-			if (!unit.checked) Game.controller.checkTrap(unit);
+			if (!unit.checked)
+				Game.controller.checkTrap(unit);
 			if (unit != selectedUnit)
 				Game.mapDataStorage.setWalkable(unit.getCoordinate().x, unit.getCoordinate().y, false);
 		}

@@ -1,5 +1,7 @@
 package ld.view.unit;
 
+import ld.data.MapDataStorage.UnitType;
+import ld.utils.particles.ParticleHelper;
 import ld.utils.particles.ParticleSystem.ParticleOptions;
 import ld.utils.particles.ParticleSystem.EmitterOptions;
 import ld.utils.particles.ParticleEmitter;
@@ -23,73 +25,66 @@ class BaseUnit extends GameObject {
 	var selection:Bitmap;
 	var bitmap:Bitmap;
 	var textBlobId:String;
-    var selectDelay:Float = 0;
-    public var moveDelay:Float = 0;
-    var path:Array<Coordinate> = null;
-    var hp:Int = 10;
-    var pe:ParticleEmitter;
+	var selectDelay:Float = 0;
+
+	public var moveDelay:Float = 0;
+
+	var path:Array<Coordinate> = null;
+	var hp:Int = 10;
+	var pe:ParticleEmitter;
+	var interaction:Interactive;
 
 	public function new(tileItem:TileItem, ?parent:Object) {
 		super(parent);
 		this.tileItem = tileItem;
+		var tile = Game.controller.mapDataStorage.getTileById(tileItem.id);
+
+		bitmap = new Bitmap(tile, this);
+		bitmap.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
+
 		selection = new Bitmap(Game.controller.mapDataStorage.getTileById(72), this);
-        select(false);
-        var pOption:ParticleOptions = {
-			forceX: 0,
-			forceY: -0.7,
-			velocity: 1,
-			gravity: 50,
-			lifetime: 0.2,
-			color: 0xff0000,
-			forceRandomRange: 0.5,
-			lifetimeRandomRange: 0.2
-		}
-        var eOption:EmitterOptions = {
-			x: 50,
-			y: 50,
-			rate: 1000,
-			duration: 200,
-			positionRange: 1
-		}
-        pe = Game.view.ps.addEmitter(eOption, pOption);
-        
-		var interaction = new Interactive(16, 16, this);
-        interaction.cursor = Cursor.Button;
-		interaction.onOver = function(event:hxd.Event) {
-            if (!Game.controller.isLocked) {
-                Game.view.interaction.cursor = Cursor.Button;
-				bitmap.filter = new Glow(Globals.COLOR_SET.White, 1, 0.1);
-				// textBlobId = Game.uiManager.showTextBlob(Std.int(position.x + 8), Std.int(position.y), tileItem.type);
-			}
-		}
+		select(false);
 
-		interaction.onOut = function(event:hxd.Event) {
-			if (!Game.controller.isLocked) {
-                Game.view.interaction.cursor = Cursor.Default;
-				bitmap.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
-				// Game.uiManager.hideTextBlob(textBlobId);
+		// pe = ParticleHelper.bloodEmiter();
+		if (this.tileItem.type != Std.string(UnitType.Stone)) {
+			interaction = new Interactive(16, 16, this);
+			interaction.cursor = Cursor.Button;
+			interaction.onOver = function(event:hxd.Event) {
+				if (!Game.controller.isLocked) {
+					Game.view.interaction.cursor = Cursor.Button;
+					bitmap.filter = new Glow(Globals.COLOR_SET.White, 1, 0.1);
+					// textBlobId = Game.uiManager.showTextBlob(Std.int(position.x + 8), Std.int(position.y), tileItem.type);
+				}
 			}
-		}
 
-		interaction.onClick = function(event:hxd.Event) {
-			if (!Game.controller.isLocked) {
-				Game.view.setSelectedUnit(this);
+			interaction.onOut = function(event:hxd.Event) {
+				if (!Game.controller.isLocked) {
+					Game.view.interaction.cursor = Cursor.Default;
+					bitmap.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
+					// Game.uiManager.hideTextBlob(textBlobId);
+				}
+			}
+
+			interaction.onClick = function(event:hxd.Event) {
+				if (!Game.controller.isLocked) {
+					Game.view.setSelectedUnit(this);
+				}
 			}
 		}
 	}
 
 	public function select(isSelect:Bool) {
 		selected = isSelect;
-    }
-    
-    public function setPath(path:Array<Coordinate> ) {
+	}
+
+	public function setPath(path:Array<Coordinate>) {
 		this.path = path;
-    }
-    
-    public function wound(hp:Int) {
-        this.hp -= hp;
-        checked = true;
-        moveDelay = 0.5;
+	}
+
+	public function wound(hp:Int) {
+		this.hp -= hp;
+		checked = true;
+		moveDelay = 0.5;
 	}
 
 	override function update(dt:Float) {
@@ -102,17 +97,18 @@ class BaseUnit extends GameObject {
 		} else {
 			selection.visible = false;
 			selectDelay = 0;
-        }
+		}
 
-        if (this.path != null && path.length > 0) {
-            moveDelay -= dt;
-            if (moveDelay < 0) {
-                moveDelay = 0.06;
-                var nC = path.shift();
-                checked = false;
-                position = new Point(nC.x * Globals.CELL_SIZE, nC.y * Globals.CELL_SIZE);
-            }
-        }
-        pe.position = new Point(position.x + Globals.CELL_SIZE / 2, position.y + Globals.CELL_SIZE / 3);
+		if (this.path != null && path.length > 0) {
+			moveDelay -= dt;
+			if (moveDelay < 0) {
+				moveDelay = 0.06;
+				var nC = path.shift();
+				checked = false;
+				position = new Point(nC.x * Globals.CELL_SIZE, nC.y * Globals.CELL_SIZE);
+			}
+		}
+		if (pe != null)
+			pe.position = new Point(position.x + Globals.CELL_SIZE / 2, position.y + Globals.CELL_SIZE / 3);
 	}
 }

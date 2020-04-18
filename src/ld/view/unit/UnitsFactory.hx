@@ -8,6 +8,7 @@ class UnitsFactory {
 		if (tileItem.type ==Std.string(King)) return new KingUnit(tileItem);
 		if (tileItem.type ==Std.string(Defender)) return new DefenderUnit(tileItem);
 		if (tileItem.type ==Std.string(Archer)) return new ArcherUnit(tileItem);
+		if (tileItem.type ==Std.string(Stone)) return new StoneUnit(tileItem);
 		return null;
 	}
 }

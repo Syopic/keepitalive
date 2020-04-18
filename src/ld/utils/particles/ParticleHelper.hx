@@ -1,5 +1,6 @@
 package ld.utils.particles;
 
+import ld.utils.particles.ParticleSystem.EmitterOptions;
 import ld.utils.particles.ParticleSystem.ParticleOptions;
 
 class ParticleHelper {
@@ -18,5 +19,26 @@ class ParticleHelper {
 			lifetimeRandomRange: 0.5
 		}
 		return options;
+	}
+
+	public static function bloodEmiter():ParticleEmitter {
+		var pOption:ParticleOptions = {
+			forceX: 0,
+			forceY: -0.7,
+			velocity: 1,
+			gravity: 50,
+			lifetime: 0.2,
+			color: 0xff0000,
+			forceRandomRange: 0.5,
+			lifetimeRandomRange: 0.2
+		}
+        var eOption:EmitterOptions = {
+			x: 50,
+			y: 50,
+			rate: 1000,
+			duration: 200,
+			positionRange: 1
+		}
+		return Game.view.ps.addEmitter(eOption, pOption);
 	}
 }

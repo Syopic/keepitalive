@@ -130,6 +130,7 @@ enum UnitType {
 	King;
 	Defender;
 	Archer;
+	Stone;
 }
 
 enum CellType {
