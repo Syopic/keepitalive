@@ -1,5 +1,8 @@
 package ld.data;
 
+import pathfinder.EHeuristic;
+import pathfinder.Coordinate;
+import pathfinder.Pathfinder;
 import h2d.TileGroup;
 import h2d.Tile;
 import hxd.res.Resource;
@@ -11,16 +14,20 @@ class MapDataStorage {
 	public var tileHeight:Int = 0;
 
 	public var tileImage:Tile;
+    public var tileItems:Array<TileItem>;
 
 	private var tiledMapData:TiledMapData;
+	private var mapData:MapData;
+	
     private var tileSet:TiledMapSet;
-    private var tiles:Array<Tile>;
+	private var tiles:Array<Tile>;
+	private var pathFinder:Pathfinder;
 
 	public function new(mapData:Resource) {
 		tileImage = hxd.Res.img.tileSet.toTile();
 		parse(mapData);
 	}
-
+	
 	private function parse(res:Resource) {
 		tiledMapData = haxe.Json.parse(res.entry.getText());
 		mapWidth = tiledMapData.width;
@@ -28,12 +35,27 @@ class MapDataStorage {
 		tileWidth = tiledMapData.tilewidth;
 		tileHeight = tiledMapData.tileheight;
 		tileSet = tiledMapData.tilesets[0];
+		tileItems = tileSet.tiles;
 		tiles = [
 			for (y in 0...Std.int(tileImage.height / tileHeight))
 				for (x in 0...Std.int(tileImage.width / tileWidth))
 					tileImage.sub(x * tileWidth, y * tileHeight, tileWidth, tileHeight)
 		];
-    }
+		
+		mapData = new MapData(mapWidth, mapHeight);
+
+		for (y in 0...mapHeight) {
+			for (x in 0...mapWidth) {
+				var tid = getTileId(x, y, 0);
+				mapData.setWalkable(x, y, tid == 0);
+			}
+		}
+		pathFinder = new Pathfinder(mapData);
+	}
+	
+	public function findPath(from:Coordinate, to:Coordinate):Array<Coordinate> {
+		return pathFinder.createPath(from, to, EHeuristic.PRODUCT, false, true);
+	}
     
     public function getTileById(id:Int):Tile {
 		return tiles[id];
@@ -55,11 +77,31 @@ class MapDataStorage {
 	//     return  tiledMapData.layers[layer].objects;
 	// }
 
-	public function getTileItem(x:Int, y:Int):TileItem {
+	public function getTileItemById(id:Int):TileItem {
+		for (t in tileSet.tiles) {
+			if (t.id == id - 1) {
+				return t;
+			}
+		}
+		return null;
+	}
+
+	public function getTileItem(x:Int, y:Int, layer:Int = 0):TileItem {
 		var tid = tiledMapData.layers[0].data[x + y * mapWidth];
 		return tileSet.tiles[tid - 1];
 	}
 }
+enum UnitType {
+	King;
+	Defender;
+	Archer;
+}
+
+enum CellType {
+	Wall;
+	WinTarget;
+}
+
 
 typedef TiledMapData = {
 	var layers:Array<TiledMapLayer>;

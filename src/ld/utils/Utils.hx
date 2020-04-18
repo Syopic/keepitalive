@@ -1,5 +1,8 @@
 package ld.utils;
 
+import ld.data.Globals;
+import pathfinder.Coordinate;
+
 class Utils {
 	public static function uid():String {
 		var result = "";
@@ -40,5 +43,9 @@ class Utils {
 				parent.removeChild(o);
 		}
 		return true;
+	}
+
+	public static function getCoord(x:Float, y:Float):Coordinate {
+		return new Coordinate(Std.int(x / Globals.CELL_SIZE), Std.int(y / Globals.CELL_SIZE)) ;
 	}
 }

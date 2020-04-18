@@ -2,6 +2,7 @@
 -lib heaps
 -lib domkit
 -lib tweenx
+-lib Pathfinder
 -lib tweenxcore
 -js out/ld.js
 -main ld.Game

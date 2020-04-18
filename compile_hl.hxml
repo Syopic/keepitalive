@@ -3,6 +3,7 @@
 -lib domkit
 -lib hlsdl
 -lib tweenx
+-lib Pathfinder
 -lib tweenxcore
 -hl out/hlboot.dat
 -main ld.Game

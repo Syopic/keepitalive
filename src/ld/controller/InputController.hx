@@ -1,5 +1,8 @@
 package ld.controller;
 
+import pathfinder.Coordinate;
+import hxd.Cursor;
+import h2d.Interactive;
 import ld.data.Globals;
 import h2d.col.Point;
 import hxd.Key;
@@ -16,7 +19,10 @@ class InputController {
 		// keyboard
 		if (event.kind == EKeyDown) {
 			switch (event.keyCode) {
-				case Key.SPACE:
+				case Key.SPACE: {
+					Game.view.clearUnitSelection();
+					Game.view.pathView.clearPath();
+				}
 
 				case Key.DOWN:
 
@@ -24,9 +30,12 @@ class InputController {
 
 				case Key.LEFT:
 
-				case Key.RIGHT:
+				case Key.ESCAPE: 
 			}
 		} else if (event.kind == EPush) {
+			if (event.button == Key.MOUSE_LEFT) {
+				
+			}
 			if (event.button == Key.MOUSE_RIGHT) {
 				startDragPosition = new Point(event.relX + Game.view.camera.viewX * Globals.SCALE_FACTOR,
 					event.relY + Game.view.camera.viewY * Globals.SCALE_FACTOR);

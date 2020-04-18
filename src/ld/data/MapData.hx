@@ -1,6 +1,8 @@
 package ld.data;
 
-class MapData {
+import pathfinder.IMap;
+
+class MapData implements IMap {
 	public var rows(default, null):Int;
 	public var cols(default, null):Int;
 

@@ -11,6 +11,7 @@ class Globals {
     public static var SCALE_FACTOR:Float = 4;
     public static var STAGE_WIDTH:Int = 160;
 	public static var STAGE_HEIGHT:Int = 144;
+	public static var CELL_SIZE:Int = 16;
 
     public static var COLOR_SET = {
 		Transparent: 16777215,

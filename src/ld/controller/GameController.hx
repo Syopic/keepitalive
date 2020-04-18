@@ -21,6 +21,23 @@ class GameController {
 		Game.view.dispose();
 	}
 
+	public function checkGame() {
+		for (unit in Game.view.units) {
+			var c = unit.getCoordinate();
+			var ti = Game.mapDataStorage.getTileItem(c.x, c.y, 0);
+			if (ti != null)
+				if (unit != null
+					&& unit.tileItem != null
+					&& unit.tileItem.type == Std.string(UnitType.King)
+					&& ti.type == Std.string(CellType.WinTarget)) {
+					if (Game.uiManager.hudScreen != null) {
+						Game.uiManager.hudScreen.showResult();
+						// lock screen
+					}
+				}
+		}
+	}
+
 	public function pause(isPause:Bool) {
 		this.isPause = isPause;
 	}

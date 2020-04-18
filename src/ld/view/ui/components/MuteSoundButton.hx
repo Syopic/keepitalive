@@ -12,8 +12,8 @@ class MuteSoundButton extends Object {
     public function new(parent:Object) {
         super(parent);
         
-        var b1 = new Bitmap(hxd.Res.img.uiTileSet.toTile().sub(0, 0, 8, 8), this);
-        var b2 = new Bitmap(hxd.Res.img.uiTileSet.toTile().sub(8, 0, 8, 8), this);
+        var b1 = new Bitmap(hxd.Res.img.uiTileSet.toTile().sub(8, 0, 8, 8), this);
+        var b2 = new Bitmap(hxd.Res.img.uiTileSet.toTile().sub(0, 0, 8, 8), this);
         
         this.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
     

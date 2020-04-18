@@ -1,5 +1,10 @@
 package ld.view;
 
+import ld.utils.Utils;
+import pathfinder.Coordinate;
+import ld.view.ui.PathView;
+import ld.view.unit.KingUnit;
+import ld.view.unit.BaseUnit;
 import h2d.col.Point;
 import h2d.Bitmap;
 import ld.view.base.GameObject;
@@ -13,19 +18,23 @@ import ld.data.Globals;
 import h2d.Object;
 import ld.view.base.Camera;
 import ld.view.thing.AnimCoinThing;
-import ld.view.unit.DefenderUnit; 
+import ld.view.unit.DefenderUnit;
+import ld.view.unit.ArcherUnit;
+import ld.view.unit.UnitsFactory;
+import ld.view.ui.GameCursor;
 
 class GameView extends Object {
 	public var uiContainer:Object;
 	public var camera:Camera;
+	public var cursor:GameCursor;
+	public var selectedUnit:BaseUnit;
+	public var pathView:PathView;
+	public var units:Array<BaseUnit> = new Array<BaseUnit>();
 
 	var container:Object;
 	var ps:ParticleSystem;
-	var objects:Array<GameObject> = new Array<GameObject>();
 	var interaction:Interactive;
 	var bgTiledGroup:TileGroup;
-
-	
 
 	public function new(parent:Object) {
 		super(parent);
@@ -40,16 +49,40 @@ class GameView extends Object {
 		bgTiledGroup = new TileGroup(Game.mapDataStorage.tileImage, camera);
 		drawMap();
 
-		// bushTiledGroup = new TileGroup(Game.mapDataStorage.tileImage, camera);
-		// bushTiledGroup.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
-		// objectsTiledGroup.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
-
-		// // var fireUnit:FireUnit = new FireUnit(camera);
-		// // fireUnit.position = new Point(40, 40);
-		// // units.push(fireUnit);
+		bgTiledGroup.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
 
 		uiContainer = new Object(camera);
+
+		cursor = new GameCursor(camera);
+
+		var interaction = new Interactive(Game.mapDataStorage.mapWidth * Globals.CELL_SIZE, Game.mapDataStorage.mapHeight * Globals.CELL_SIZE, camera);
+		interaction.propagateEvents = true;
+		interaction.cursor = Cursor.Default;
+		interaction.onClick = function(event:hxd.Event) {
+			if (selectedUnit != null) {
+				var c = Utils.getCoord(event.relX, event.relY);
+				var path = Game.mapDataStorage.findPath(selectedUnit.getCoordinate(), c);
+				pathView.clearPath();
+				selectedUnit.position = new Point(c.x * Globals.CELL_SIZE, c.y * Globals.CELL_SIZE);
+				clearUnitSelection();
+			}
+		}
+
+
+		interaction.onMove = function(event:hxd.Event) {
+			var c = Utils.getCoord(event.relX, event.relY);
+			if (selectedUnit != null) {
+				var path = Game.mapDataStorage.findPath(selectedUnit.getCoordinate(), c);
+				pathView.drawPath(path);
+			}
+
+			var t = Game.mapDataStorage.getTileItem(c.x, c.y, 0);
+			// if (t != null)
+			// 	trace(t.type);
+			cursor.setPosition(c.x * Globals.CELL_SIZE, c.y * Globals.CELL_SIZE);
+		}
 	}
+
 
 	public function drawMap() {
 		for (y in 0...Game.mapDataStorage.mapHeight) {
@@ -59,37 +92,54 @@ class GameView extends Object {
 					bgTiledGroup.add(x * Game.mapDataStorage.tileWidth, y * Game.mapDataStorage.tileHeight, Game.mapDataStorage.getTileById(tid - 1));
 			}
 		}
-
+		pathView = new PathView(camera);
 		var mapObjects = Game.mapDataStorage.getObjects();
 
 		for (obj in mapObjects) {
-		// 	// sandTiledGroup.add(obj.x, obj.y - obj.height, tiles[obj.gid - 1]);
-
-			var defender = new DefenderUnit(camera);
-			objects.push(defender);
-			defender.position.x = obj.x;
-			defender.position.y = obj.y - obj.height;
+			// 	// sandTiledGroup.add(obj.x, obj.y - obj.height, tiles[obj.gid - 1]);
+			var tile = Game.mapDataStorage.getTileItemById(obj.gid);
+			var unit:BaseUnit = UnitsFactory.getUnitByTileItem(tile);
+			if (unit != null) {
+				camera.addChild(unit);
+				units.push(unit);
+				unit.position.x = obj.x;
+				unit.position.y = obj.y - obj.height;
+			}
 		}
 	}
 
 	public function update(dt:Float) {
-		for (obj in objects) {
-			if (obj != null) {
+		for (unit in units) {
+			if (unit != null) {
 				// obj.position.x += 0.1;
-				obj.update(dt);
-				Game.uiManager.hudScreen.setScore(Std.int(obj.position.x));
+				unit.update(dt);
+				Game.uiManager.hudScreen.setScore(Std.int(unit.position.x));
 				// ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + 2), Std.int(unit.position.y), Globals.COLOR_SET.Como));
-				if (obj.position.x > Globals.STAGE_WIDTH) {
-					obj.position.x = 0;
-					obj.position.y = Std.random(144);
+				if (unit.position.x > Globals.STAGE_WIDTH) {
+					unit.position.x = 0;
+					unit.position.y = Std.random(144);
 				}
 			}
 		}
+		Game.controller.checkGame();
 		if (ps != null) {
 			ps.update(dt);
 		}
-
+		
 		camera.update(dt);
+	}
+
+	public function setSelectedUnit(unit:BaseUnit) {
+		clearUnitSelection();
+		selectedUnit = unit;
+		unit.select(true);
+	}
+
+	public function clearUnitSelection() {
+		for (unit in units) {
+			unit.select(false);
+		}
+		selectedUnit = null;
 	}
 
 	public function dispose() {
@@ -98,11 +148,11 @@ class GameView extends Object {
 		if (bgTiledGroup != null)
 			bgTiledGroup.removeChildren();
 
-		for (obj in objects) {
-			obj.remove();
-			obj = null;
+		for (unit in units) {
+			unit.remove();
+			unit = null;
 		}
-		objects = new Array<GameObject>();
+		units = new Array<BaseUnit>();
 		if (ps != null)
 			ps.dispose();
 

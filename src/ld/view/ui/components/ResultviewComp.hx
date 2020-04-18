@@ -3,8 +3,8 @@ package ld.view.ui.components;
 import ld.data.Globals;
 import h2d.Flow;
 
-@:uiComp("menuview")
-class MenuviewComp extends h2d.Flow implements h2d.domkit.Object {
+@:uiComp("resultview")
+class ResultviewComp extends h2d.Flow implements h2d.domkit.Object {
 
 	public var currentIndex:Int = 0;
 
@@ -12,27 +12,39 @@ class MenuviewComp extends h2d.Flow implements h2d.domkit.Object {
         super(parent);
 		initComponent();
 		haxe.Timer.delay(function() {
-			startButton.setFocus(true);
+			changeIndex(0);
 		}, 100);
     }
 
-    static var SRC = <menuview>
+    static var SRC = <resultview>
 		<flow vertical id="menu"> 
-			<menubutton("START GAME", onStart, clearAll) public id="startButton" />
-			<menubutton("CREDITS", onCredits, clearAll) />
+			<menubutton("RESTART", onRestart, clearAll) public id="restartButton" />
+			<menubutton("NEXT LEVEL", onRestart, clearAll) public id="nextLevelButton" />
+			<menubutton("MAIN MENU", onMainmenu, clearAll) public id="mainMenuButton" />
 		</flow>
-	</menuview>;
+	</resultview>;
 
-	public dynamic function onStart() {
-		trace("onStart" + currentIndex);
+	public dynamic function onContinue() {
+		trace("onContinue");
 		clearAll();
-		Game.uiManager.changeScreen(Globals.LEVELSELECT_SCREEN);
+		Game.uiManager.hudScreen.pause();
 	}
 
-	public dynamic function onCredits() {
-		trace("onCredits" + currentIndex);
+	public dynamic function onRestart() {
+		trace("onRestart");
 		clearAll();
-		Game.uiManager.changeScreen(Globals.CREDITS_SCREEN);
+		Game.uiManager.changeScreen(Globals.HUD_SCREEN);
+	}
+
+	public dynamic function onNextLevel() {
+		trace("onNextLevel");
+		clearAll();
+	}
+
+	public dynamic function onMainmenu() {
+		trace("onMainmenu");
+		clearAll();
+		Game.uiManager.changeScreen(Globals.TITLE_SCREEN);
 	}
 
 	public dynamic function doAction() {
@@ -47,11 +59,12 @@ class MenuviewComp extends h2d.Flow implements h2d.domkit.Object {
 		currentIndex += di;
 		if (currentIndex < 0) currentIndex = menu.children.length - 1;
 		if (currentIndex > menu.children.length - 1) currentIndex = 0;
+		if (di != 0)
 		cast(menu.children[currentIndex], MenubuttonComp).setFocus(true);
 	}
 
 	public function clearAll() {
-		// currentIndex = menu.children.length;
+		currentIndex = menu.children.length;
 		for (i in 0 ... menu.children.length) {
 			cast(menu.children[i], MenubuttonComp).setFocus(false);
 		}
