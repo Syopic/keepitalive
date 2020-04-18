@@ -216,6 +216,7 @@ class GameView extends Object {
 			interaction.remove();
 			interaction = null;
 		}
+		clearDots();
 	}
 
 	public function update(dt:Float) {
