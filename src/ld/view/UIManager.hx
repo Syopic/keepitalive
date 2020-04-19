@@ -118,7 +118,7 @@ class UIManager extends Object {
 						Game.soundManager.stopSound(Globals.MUSIC_SET.TitleTheme);
 						// Game.soundManager.playSound(Globals.MUSIC_SET.TitleTheme, 0.5, true, true);
 						Game.controller.startGame(selectedLevel);
-						if (selectedLevel < 3 && !isRestart) {
+						if (selectedLevel < 4 && !isRestart) {
 							showBrief("level " + selectedLevel, inGameContainer);
 							Game.controller.lockInput(true);
 						}
@@ -145,14 +145,14 @@ class UIManager extends Object {
 	}
 
 	public function hideBrief(id:String) {
-		if (id == Globals.INTRO_SCREEN) {
-			Game.uiManager.changeScreen(Globals.LEVELSELECT_SCREEN);
-		}
 		if (briefComp != null) {
 			briefComp.remove();
 			briefComp.dispose();
 			briefComp = null;
 			Game.controller.lockInput(false);
+		}
+		if (id == Globals.INTRO_SCREEN) {
+			Game.uiManager.changeScreen(Globals.LEVELSELECT_SCREEN);
 		}
 	}
 
@@ -160,7 +160,7 @@ class UIManager extends Object {
 		if (transitionView != null)
 			transitionView.update(dt);
 
-		if (briefComp != null && !Game.controller.isPause)
+		if (briefComp != null)
 			briefComp.update(dt);
 	}
 
@@ -186,9 +186,9 @@ class UIManager extends Object {
 		if (briefComp != null) {
 			briefComp.dispose();
 		}
-		briefComp = new BriefComp(id);
-		container.addChild(briefComp);
 		if (id == "introScreen") {
+			briefComp = new BriefComp(id);
+			container.addChild(briefComp);
 			briefComp.addMessage({img: Res.img.crownBrief.toTile(), text: "Don't you think\nthis game looks\ntoo ordinary?", isLeft: true});
 			briefComp.addMessage({img: Res.img.crownBrief.toTile(), text: "Knights,\ndungeons?", isLeft: true});
 			briefComp.addMessage({img: Res.img.defBrief.toTile(), text: "I'm ok", isLeft: false});
@@ -203,6 +203,8 @@ class UIManager extends Object {
 			briefComp.addMessage({img: Res.img.crownBrief.toTile(), text: "Well. Remember -\nI have to stay\nalive!", isLeft: true});
 			briefComp.start();
 		} else if (id == "level 1") {
+			briefComp = new BriefComp(id);
+			container.addChild(briefComp);
 			briefComp.addMessage({img: Res.img.crownBrief.toTile(), text: "It seems\nvery simple", isLeft: true});
 			briefComp.addMessage({img: Res.img.defBrief.toTile(), text: "archer,\nstand below me", isLeft: false});
 			briefComp.addMessage({img: Res.img.defBrief.toTile(), text: "And you stand\nbehind him", isLeft: false});
@@ -210,11 +212,19 @@ class UIManager extends Object {
 
 			briefComp.start();
 		} else if (id == "level 2") {
+			briefComp = new BriefComp(id);
+			container.addChild(briefComp);
 			briefComp.addMessage({img: Res.img.defBrief.toTile(), text: "I can move\nstones!\nHo ho ho", isLeft: false});
 			briefComp.addMessage({img: Res.img.archBrief.toTile(), text: "Think about\nnot getting\ntrapped", isLeft: false});
 
 			briefComp.start();
-		}else {
+		} else if (id == "level 3") {
+			briefComp = new BriefComp(id);
+			container.addChild(briefComp);
+			briefComp.addMessage({img: Res.img.archBrief.toTile(), text: "You can drag\nwith the\nmouse wheel", isLeft: false});
+
+			briefComp.start();
+		} else {
 			briefComp.dispose();
 			briefComp = null;
 		}

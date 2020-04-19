@@ -26,7 +26,7 @@ class GameController {
 			case 2:
 				mapDataStorage = new MapDataStorage(hxd.Res.map2);
 			case 3:
-				mapDataStorage = new MapDataStorage(hxd.Res.map2);
+				mapDataStorage = new MapDataStorage(hxd.Res.map3);
 		}
 		Game.mapDataStorage = mapDataStorage;
 		Game.view.init();

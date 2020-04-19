@@ -123,7 +123,9 @@ class BriefComp extends Object {
 		}
 	}
 
-	public function dispose() {}
+	public function dispose() {
+		this.remove();
+	}
 }
 
 typedef BriefMessage = {
