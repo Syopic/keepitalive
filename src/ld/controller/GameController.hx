@@ -21,7 +21,7 @@ class GameController {
 	public function startGame(level:Int = 1) {
 		switch (level) {
 			case 1:
-				mapDataStorage = new MapDataStorage(hxd.Res.map1);
+				mapDataStorage = new MapDataStorage(hxd.Res.map);
 			case 2:
 				mapDataStorage = new MapDataStorage(hxd.Res.map2);
 			case 3:
@@ -32,8 +32,8 @@ class GameController {
 		Game.inputController = new InputController();
 		this.isPause = false;
 		steps = 0;
-		lockInput(false);
 		isCompleted = false;
+		lockInput(false);
 	}
 
 	public function lockInput(isLock:Bool) {

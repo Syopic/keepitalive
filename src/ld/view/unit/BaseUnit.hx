@@ -1,5 +1,7 @@
 package ld.view.unit;
 
+import h2d.filter.Outline;
+import h2d.Anim;
 import h2d.Graphics;
 import ld.data.MapDataStorage.UnitType;
 import ld.utils.particles.ParticleHelper;
@@ -22,9 +24,11 @@ class BaseUnit extends GameObject {
 	public var tileItem:TileItem;
 	public var selected:Bool = false;
 	public var checked:Bool = false;
+	var animContainer:Object;
 
 	var selection:Bitmap;
 	var bitmap:Bitmap;
+	var anim:Anim;
 	var healthbar:Graphics;
 	var textBlobId:String;
 	var selectDelay:Float = 0;
@@ -46,6 +50,8 @@ class BaseUnit extends GameObject {
 
 		bitmap = new Bitmap(tile, this);
 		bitmap.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
+		animContainer = new Object(this);
+		animContainer.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
 
 		healthbar = new h2d.Graphics(this);
 		healthbar.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
@@ -62,14 +68,19 @@ class BaseUnit extends GameObject {
 					bitmap.filter = new Glow(Globals.COLOR_SET.White, 1, 0.1);
 					isOver = true;
 					// textBlobId = Game.uiManager.showTextBlob(Std.int(position.x + 8), Std.int(position.y), tileItem.type);
+					animContainer.filter = new Glow(Globals.COLOR_SET.White, 1, 0.1);
 				}
 			}
+
 
 			interaction.onOut = function(event:hxd.Event) {
 				if (!Game.controller.isLocked) {
 					Game.view.interaction.cursor = Cursor.Default;
 					bitmap.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
 					isOver = false;
+
+					animContainer.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
+					
 
 					// Game.uiManager.hideTextBlob(textBlobId);
 				}
@@ -147,6 +158,9 @@ class BaseUnit extends GameObject {
 		}
 		if (pe != null) {
 			pe.position = new Point(position.x + Globals.CELL_SIZE / 2, position.y + Globals.CELL_SIZE / 3);
+		}
+		if (anim != null) {
+			anim.currentFrame += dt * anim.speed;
 		}
 	}
 

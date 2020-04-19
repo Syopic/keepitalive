@@ -1,5 +1,6 @@
 package ld.view;
 
+import ld.view.ui.LinksView;
 import ld.data.MapDataStorage.UnitType;
 import ld.controller.GameController;
 import ld.view.ui.DotView;
@@ -35,6 +36,7 @@ class GameView extends Object {
 	public var cursor:GameCursor;
 	public var selectedUnit:BaseUnit;
 	public var pathView:PathView;
+	public var linksView:LinksView;
 	public var units:Array<BaseUnit> = new Array<BaseUnit>();
 	public var interaction:Interactive;
 	public var dots:Array<DotView>;
@@ -62,6 +64,7 @@ class GameView extends Object {
 
 		drawMap();
 
+		linksView = new LinksView(camera);
 		pathView = new PathView(camera);
 
 		unitsContainer = new Object(camera);
@@ -77,7 +80,6 @@ class GameView extends Object {
 				unit.position.y = obj.y - obj.height;
 			}
 		}
-		
 
 		dotsContainer = new Object(camera);
 		dotsContainer.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
@@ -114,7 +116,6 @@ class GameView extends Object {
 							pathView.clearPath();
 							selectedUnit.setPath(path);
 							Game.uiManager.hudScreen.setScore(++Game.controller.steps);
-
 						}
 						clearUnitSelection();
 					}
@@ -169,7 +170,7 @@ class GameView extends Object {
 		}
 		selectedUnit = null;
 	}
-	
+
 	public function addDot(c:Coordinate) {
 		var dot = new DotView(dotsContainer);
 		dot.position = new Point((c.x) * Globals.CELL_SIZE, c.y * Globals.CELL_SIZE);
@@ -189,8 +190,13 @@ class GameView extends Object {
 
 	var testC:Array<Coordinate> = new Array<Coordinate>();
 
-	public function checkDot(dotCoordinate:Coordinate) {
-		var sc = selectedUnit.getCoordinate();
+	public function checkDot(dotCoordinate:Coordinate, unit:BaseUnit = null) {
+		var sc = null;
+		if (unit != null) {
+			sc = unit.getCoordinate();
+		} else {
+			sc = selectedUnit.getCoordinate();
+		}
 		testC = new Array<Coordinate>();
 		testC.push(dotCoordinate);
 		for (n in units) {
@@ -211,10 +217,36 @@ class GameView extends Object {
 			}
 		}
 
-		var path = Game.mapDataStorage.findPath(dotCoordinate, sc, selectedUnit.tileItem.type == Std.string(UnitType.Archer));
+		if (selectedUnit != null) {
+			var path = Game.mapDataStorage.findPath(dotCoordinate, sc, selectedUnit.tileItem.type == Std.string(UnitType.Archer));
+			
+			if (Game.mapDataStorage.isWalkable(dotCoordinate.x, dotCoordinate.y) && path != null && isValid)
+				addDot(dotCoordinate);
+		}
+	}
 
-		if (Game.mapDataStorage.isWalkable(dotCoordinate.x, dotCoordinate.y) && path != null && isValid)
-			addDot(dotCoordinate);
+	public function checkLinks() {
+		linksView.clear();
+		// if (selectedUnit != null)
+		// 	checkDot(new Coordinate(selectedUnit.getCoordinate().x, selectedUnit.getCoordinate().y));
+
+		for (n in units) {
+			for (n2 in units) {
+				checkDot(n.getCoordinate(), n2);
+			}
+		}
+
+		for (n in units) {
+			for (n2 in units) {
+				if (!n2.getCoordinate().isEqualTo(n.getCoordinate())
+					&& n.tileItem.type != Std.string(UnitType.Stone)
+					&& n2.tileItem.type != Std.string(UnitType.Stone)) {
+					var path = Game.mapDataStorage.unitFindPath(n.getCoordinate(), n2.getCoordinate());
+					if (path != null)
+						linksView.drawPath(path);
+				}
+			}
+		}
 	}
 
 	public function getUnitByCoord(x:Int, y:Int) {
@@ -316,5 +348,7 @@ class GameView extends Object {
 			cursor.setPosition(c.x * Globals.CELL_SIZE, c.y * Globals.CELL_SIZE);
 		} else
 			cursor.visible = false;
+
+		checkLinks();
 	}
 }

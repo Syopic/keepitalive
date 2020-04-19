@@ -53,6 +53,7 @@ class UIManager extends Object {
 		} else
 			changeScreen(Globals.TITLE_SCREEN, true);
 	}
+	
 
 	public function changeScreen(screenName:String, isFirst:Bool = false) {
 		currentScreen = screenName;
