@@ -21,7 +21,7 @@ class GameOverScreen extends h2d.Object {
 
 		panelFlow.verticalSpacing = 5;
 
-		panelFlow.paddingTop = 110;
+		panelFlow.paddingTop = 100;
 		panelFlow.paddingLeft = 32;
 		
 		menuView = new GameoverviewComp(panelFlow);

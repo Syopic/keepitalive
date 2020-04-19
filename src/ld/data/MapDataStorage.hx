@@ -99,6 +99,10 @@ class MapDataStorage {
 		return getTileById(getTileId(x, y, layer));
 	}
 
+	public function setTileId(x:Int, y:Int, id:Int, layer:Int = 0) {
+		tiledMapData.layers[layer].data[x + y * mapWidth] = id;
+	}
+
 	public function getTileId(x:Int, y:Int, layer:Int = 0):Int {
 		return tiledMapData.layers[layer].data[x + y * mapWidth];
 	}

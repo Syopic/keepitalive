@@ -13,5 +13,6 @@ class DefenderUnit extends BaseUnit {
     
     public function new(tileItem:TileItem, ?parent:Object) {
         super(tileItem, parent);
+        hpKoef = 0.5;
     }
 }

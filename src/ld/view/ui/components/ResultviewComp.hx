@@ -18,8 +18,8 @@ class ResultviewComp extends h2d.Flow implements h2d.domkit.Object {
 
     static var SRC = <resultview>
 		<flow vertical id="menu"> 
-			<menubutton("RESTART", onRestart, clearAll) public id="restartButton" />
 			<menubutton("NEXT LEVEL", onNextLevel, clearAll) public id="nextLevelButton" />
+			<menubutton("RESTART", onRestart, clearAll) public id="restartButton" />
 			<menubutton("MAIN MENU", onMainmenu, clearAll) public id="mainMenuButton" />
 		</flow>
 	</resultview>;

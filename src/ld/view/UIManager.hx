@@ -110,7 +110,7 @@ class UIManager extends Object {
 						hudScreen = new HUDScreen(screenContainer);
 					}
 			}
-		}, 200);
+		}, 250);
 	}
 
 	public function showBrief() {

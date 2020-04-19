@@ -33,8 +33,9 @@ class BaseUnit extends GameObject {
 	public var moveDelay:Float = 0;
 
 	var path:Array<Coordinate> = null;
-	var hp:Int = 10;
-	var hpCapacity:Int = 10;
+	var hp:Float = 10;
+	var hpCapacity:Float = 10;
+	var hpKoef:Float = 1;
 	var pe:ParticleEmitter;
 	var interaction:Interactive;
 
@@ -92,7 +93,7 @@ class BaseUnit extends GameObject {
 	}
 
 	public function wound(hp:Int) {
-		this.hp -= hp;
+		this.hp -= hp * hpKoef;
 		this.hp = this.hp < 0 ? 0 : this.hp;
 		if (this.hp < this.hpCapacity / 2) {
 			if (pe == null)
@@ -104,7 +105,7 @@ class BaseUnit extends GameObject {
 			}
 		}
 		checked = true;
-		moveDelay = 0.6;
+		moveDelay = 0.3;
 	}
 
 	public function updateHealthbar(isShow:Bool = false) {
@@ -122,7 +123,7 @@ class BaseUnit extends GameObject {
 
 	override function update(dt:Float) {
 		super.update(dt);
-		updateHealthbar(selected || isOver || checked);
+		updateHealthbar(selected || isOver);
 		if (selected) {
 			if (--selectDelay < 0) {
 				selection.visible = !selection.visible;
@@ -137,6 +138,7 @@ class BaseUnit extends GameObject {
 			moveDelay -= dt;
 			if (moveDelay < 0) {
 				moveDelay = 0.06;
+				Game.view.pathView.drawPath(path);
 				var nC = path.shift();
 				checked = false;
 				position = new Point(nC.x * Globals.CELL_SIZE, nC.y * Globals.CELL_SIZE);

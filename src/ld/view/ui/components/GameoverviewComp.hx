@@ -16,10 +16,14 @@ class GameoverviewComp extends h2d.Flow implements h2d.domkit.Object {
 
     static var SRC = <gameoverview>
 		<flow vertical> 
+			<menubutton("RESTART", onRestart, null) public id="restatButton"/>
 			<menubutton("MAIN MENU", onBack, null) public id="backButton"/>
 		</flow>
 	</gameoverview>;
 
+	public dynamic function onRestart() {
+		Game.uiManager.changeScreen(Globals.HUD_SCREEN);
+	}
 	public dynamic function onBack() {
 		Game.uiManager.changeScreen(Globals.TITLE_SCREEN);
 	}

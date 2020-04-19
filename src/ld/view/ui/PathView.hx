@@ -1,5 +1,6 @@
 package ld.view.ui;
 
+import h2d.filter.Outline;
 import h2d.filter.Glow;
 import ld.data.Globals;
 import h2d.Graphics;
@@ -14,6 +15,7 @@ class PathView extends GameObject {
 	public function new(?parent:Object) {
 		super(parent);
 		graphics = new h2d.Graphics(this);
+		this.filter = new Outline(0.8, Globals.COLOR_SET.Aztec, 1);
     }
     
     public function clearPath() {
@@ -35,13 +37,16 @@ class PathView extends GameObject {
 				else
 					graphics.lineTo(tx, ty);
 			}
-			graphics.beginFill(Globals.COLOR_SET.SpringRain);
-			var c = path[path.length - 1];
-			var tx = c.x * Globals.CELL_SIZE + Globals.CELL_SIZE / 2;
-			var ty = c.y * Globals.CELL_SIZE + Globals.CELL_SIZE / 2;
-			graphics.drawRect(tx - 2, ty - 2, 4, 4);
-			graphics.endFill();
+			// graphics.beginFill(Globals.COLOR_SET.SpringRain);
+			// var c = path[path.length - 1];
+			// var tx = c.x * Globals.CELL_SIZE + Globals.CELL_SIZE / 2;
+			// var ty = c.y * Globals.CELL_SIZE + Globals.CELL_SIZE / 2;
+			// graphics.drawRect(tx - 2, ty - 2, 4, 4);
+			// graphics.endFill();
 		}
-        this.filter = new Glow(Globals.COLOR_SET.Aztec, 0, 0.1);
+		// this.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
 	}
 }
+
+
+

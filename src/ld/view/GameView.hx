@@ -28,6 +28,7 @@ import ld.view.ui.GameCursor;
 
 class GameView extends Object {
 	public var uiContainer:Object;
+	public var bgContainer:Object;
 	public var unitsContainer:Object;
 	public var dotsContainer:Object;
 	public var camera:Camera;
@@ -54,12 +55,14 @@ class GameView extends Object {
 		dispose();
 		// var tile = hxd.Res.img.concept.toTile();
 		// var bgImage = new Bitmap(tile, camera);
-		dotsContainer = new Object(camera);
+
 		ps = new ParticleSystem();
 
-		bgTiledGroup = new TileGroup(Game.mapDataStorage.tileImage, camera);
-		bgTiledGroup.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
+		bgContainer = new Object(camera);
+
 		drawMap();
+
+		pathView = new PathView(camera);
 
 		unitsContainer = new Object(camera);
 		var mapObjects = Game.mapDataStorage.getObjects();
@@ -74,6 +77,10 @@ class GameView extends Object {
 				unit.position.y = obj.y - obj.height;
 			}
 		}
+		
+
+		dotsContainer = new Object(camera);
+		dotsContainer.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
 		interaction = new Interactive(Game.mapDataStorage.mapWidth * Globals.CELL_SIZE, Game.mapDataStorage.mapHeight * Globals.CELL_SIZE, camera);
 		interaction.propagateEvents = true;
 		interaction.cursor = Cursor.Default;
@@ -83,12 +90,17 @@ class GameView extends Object {
 				var unit = getUnitByCoord(c.x, c.y);
 				if (selectedUnit != null) {
 					if (unit != null) {
-						if (unit.tileItem.type == Std.string(UnitType.Stone) && selectedUnit.tileItem.type == Std.string(UnitType.Defender)) {
-							if (Utils.getDistanceCoord(unit.getCoordinate(), selectedUnit.getCoordinate()) == 1)
+						if (unit.tileItem.type == Std.string(UnitType.Stone)
+							&& selectedUnit.tileItem.type == Std.string(UnitType.Defender)) {
+							if (Utils.getDistanceCoord(unit.getCoordinate(), selectedUnit.getCoordinate()) == 1) {
 								Game.controller.moveStone(unit, selectedUnit.getCoordinate());
+								Game.uiManager.hudScreen.setScore(++Game.controller.steps);
+							}
 							cursor.setMode(CursorMode.Default);
-						} else {
+						} else if (unit.tileItem.type != Std.string(UnitType.Stone)) {
 							setSelectedUnit(unit);
+						} else {
+							clearUnitSelection();
 						}
 					} else {
 						var isFree:Bool = false;
@@ -97,15 +109,16 @@ class GameView extends Object {
 								isFree = true;
 						}
 						if (isFree) {
-							var path = Game.mapDataStorage.findPath(selectedUnit.getCoordinate(), c, selectedUnit.tileItem.type == Std.string(UnitType.Archer));
+							var path = Game.mapDataStorage.findPath(selectedUnit.getCoordinate(), c,
+								selectedUnit.tileItem.type == Std.string(UnitType.Archer));
 							pathView.clearPath();
 							selectedUnit.setPath(path);
-							Game.controller.steps++;
-							Game.uiManager.hudScreen.setScore(Game.controller.steps);
+							Game.uiManager.hudScreen.setScore(++Game.controller.steps);
+
 						}
 						clearUnitSelection();
 					}
-				} else if (unit != null) {
+				} else if (unit != null && unit.tileItem.type != Std.string(UnitType.Stone)) {
 					setSelectedUnit(unit);
 				}
 			}
@@ -122,6 +135,14 @@ class GameView extends Object {
 	}
 
 	public function drawMap() {
+		if (bgTiledGroup != null) {
+			bgContainer.removeChild(bgTiledGroup);
+			bgTiledGroup.removeChildren();
+			bgTiledGroup = null;
+		}
+
+		bgTiledGroup = new TileGroup(Game.mapDataStorage.tileImage, bgContainer);
+		bgTiledGroup.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
 		for (y in 0...Game.mapDataStorage.mapHeight) {
 			for (x in 0...Game.mapDataStorage.mapWidth) {
 				var tid = Game.mapDataStorage.getTileId(x, y, 0);
@@ -129,7 +150,6 @@ class GameView extends Object {
 					bgTiledGroup.add(x * Game.mapDataStorage.tileWidth, y * Game.mapDataStorage.tileHeight, Game.mapDataStorage.getTileById(tid - 1));
 			}
 		}
-		pathView = new PathView(camera);
 	}
 
 	public function setSelectedUnit(unit:BaseUnit) {
@@ -227,6 +247,7 @@ class GameView extends Object {
 
 	public function update(dt:Float) {
 		Game.mapDataStorage.updateWalkableMap();
+
 		for (unit in units) {
 			unit.update(dt);
 			if (!unit.checked)

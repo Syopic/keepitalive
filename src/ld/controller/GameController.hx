@@ -13,6 +13,7 @@ class GameController {
 
 	public var isPause:Bool = false;
 	public var isLocked:Bool = false;
+	public var isCompleted:Bool = false;
 	public var steps:Int = 0;
 
 	public function new() {}
@@ -22,13 +23,14 @@ class GameController {
 			case 1:
 				mapDataStorage = new MapDataStorage(hxd.Res.map1);
 			case 2:
-				mapDataStorage = new MapDataStorage(hxd.Res.map);
+				mapDataStorage = new MapDataStorage(hxd.Res.map2);
 		}
 		Game.mapDataStorage = mapDataStorage;
 		Game.view.init();
 		Game.inputController = new InputController();
 		this.isPause = false;
 		steps = 0;
+		lockInput(false);
 	}
 
 	public function lockInput(isLock:Bool) {
@@ -49,24 +51,36 @@ class GameController {
 					&& unit.tileItem.type == Std.string(UnitType.King)
 					&& ti.type == Std.string(CellType.WinTarget)) {
 					if (Game.uiManager.hudScreen != null) {
-						Game.uiManager.hudScreen.showResult();
-						// lock screen
+						unit.visible = false;
+						for (i in 0...10)
+							Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2),
+								Std.int(unit.position.y + Globals.CELL_SIZE / 2), 0x29a2d9));
+						if (!isLocked)
+							haxe.Timer.delay(function() {
+								Game.uiManager.hudScreen.showResult();
+							}, 2000);
+						lockInput(true);
+						isCompleted = true;
 					}
 				}
 		}
 	}
 
+	
+
 	public function checkTrap(unit:BaseUnit):Bool {
 		var result:Bool = false;
-		if (unit.tileItem.type != Std.string(UnitType.Stone)) {
-			var c = unit.getCoordinate();
-			var ti = Game.mapDataStorage.getTileItem(c.x, c.y, 0);
-			if (ti != null && ti.type == Std.string(CellType.Trap)) {
-				unit.wound(2);
-				for (i in 0...10)
-					Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2),
-						Std.int(unit.position.y + Globals.CELL_SIZE / 2), 0xff0000));
-				result = true;
+		if (!isCompleted) {
+			if (unit.tileItem.type != Std.string(UnitType.Stone)) {
+				var c = unit.getCoordinate();
+				var ti = Game.mapDataStorage.getTileItem(c.x, c.y, 0);
+				if (ti != null && ti.type == Std.string(CellType.Trap)) {
+					unit.wound(2);
+					for (i in 0...10)
+						Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2),
+							Std.int(unit.position.y + Globals.CELL_SIZE / 2), 0xff0000));
+					result = true;
+				}
 			}
 		}
 
@@ -74,10 +88,21 @@ class GameController {
 	}
 
 	public function removeUnit(unit:BaseUnit) {
-		Game.view.units.remove(unit);
-		unit.dispose();
-		unit.remove();
-		unit = null;
+		if (unit.tileItem.type == Std.string(UnitType.King)) {
+			for (i in 0...10)
+				Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2),
+					Std.int(unit.position.y + Globals.CELL_SIZE / 2), 0xff0000));
+			if (!isLocked)
+				haxe.Timer.delay(function() {
+					Game.uiManager.changeScreen(Globals.GAMEOVER_SCREEN);
+				}, 2000);
+			lockInput(true);
+		} else {
+			Game.view.units.remove(unit);
+			unit.dispose();
+			unit.remove();
+			unit = null;
+		}
 	}
 
 	public function setStone(unit:BaseUnit) {
@@ -107,8 +132,18 @@ class GameController {
 		var dx = c.x - from.x;
 		var dy = c.y - from.y;
 		if (Game.mapDataStorage.isWalkable(c.x + dx, c.y + dy)) {
-			var path = [new Coordinate(c.x + dx, c.y + dy)];
-			unit.setPath(path);
+			var ti = Game.mapDataStorage.getTileItem(c.x + dx, c.y + dy);
+			if (ti != null && ti.type == Std.string(CellType.Trap)) {
+				removeUnit(unit);
+				Game.mapDataStorage.setTileId(c.x + dx, c.y + dy, 0);
+				Game.view.drawMap();
+				for (i in 0...20)
+					Game.view.ps.addParticle(ParticleHelper.trap(Std.int((c.x + dx) * Globals.CELL_SIZE + Globals.CELL_SIZE / 2),
+						Std.int((c.y + dy) * Globals.CELL_SIZE + Globals.CELL_SIZE / 2), Globals.COLOR_SET.TimberGreen));
+			} else {
+				var path = [new Coordinate(c.x + dx, c.y + dy)];
+				unit.setPath(path);
+			}
 			for (i in 0...4)
 				Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2),
 					Std.int(unit.position.y + Globals.CELL_SIZE / 2), Globals.COLOR_SET.Como));
@@ -118,7 +153,6 @@ class GameController {
 				Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2),
 					Std.int(unit.position.y + Globals.CELL_SIZE / 2), Globals.COLOR_SET.SpringRain));
 		}
-
 	}
 
 	public function pause(isPause:Bool) {
