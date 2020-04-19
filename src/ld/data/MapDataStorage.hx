@@ -83,8 +83,8 @@ class MapDataStorage {
 		return mapData.isWalkable(x, y);
 	}
 	
-	public function findPath(from:Coordinate, to:Coordinate):Array<Coordinate> {
-		return pathFinder.createPath(from, to, EHeuristic.PRODUCT, false, true);
+	public function findPath(from:Coordinate, to:Coordinate, isDiagonal:Bool = false):Array<Coordinate> {
+		return pathFinder.createPath(from, to, EHeuristic.PRODUCT, isDiagonal, true);
 	}
 
 	public function unitFindPath(from:Coordinate, to:Coordinate):Array<Coordinate> {

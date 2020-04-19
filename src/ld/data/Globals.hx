@@ -4,7 +4,7 @@ import ld.utils.macros.ProjectMacros;
 
 class Globals {
 	// Config
-	public static var skipMainMenu:Bool = false;
+	public static var skipMainMenu:Bool = true;
 
 	// Constants
 	public static var VERSION:String = "v. " + "0.1.0.1 " + ProjectMacros.getBuildDate().toString();

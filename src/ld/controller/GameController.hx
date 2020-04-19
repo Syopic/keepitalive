@@ -1,5 +1,8 @@
 package ld.controller;
 
+import pathfinder.Coordinate;
+import ld.view.unit.UnitsFactory;
+import ld.view.unit.StoneUnit;
 import ld.data.Globals;
 import ld.utils.particles.ParticleHelper;
 import ld.view.unit.BaseUnit;
@@ -15,9 +18,11 @@ class GameController {
 	public function new() {}
 
 	public function startGame(level:Int = 1) {
-		switch(level) {
-			case 1: mapDataStorage = new MapDataStorage(hxd.Res.map1);
-			case 2: mapDataStorage = new MapDataStorage(hxd.Res.map);
+		switch (level) {
+			case 1:
+				mapDataStorage = new MapDataStorage(hxd.Res.map1);
+			case 2:
+				mapDataStorage = new MapDataStorage(hxd.Res.map);
 		}
 		Game.mapDataStorage = mapDataStorage;
 		Game.view.init();
@@ -53,17 +58,67 @@ class GameController {
 
 	public function checkTrap(unit:BaseUnit):Bool {
 		var result:Bool = false;
-		var c = unit.getCoordinate();
-		var ti = Game.mapDataStorage.getTileItem(c.x, c.y, 0);
-		if (ti != null && ti.type == Std.string(CellType.Trap)) {
-			unit.wound(2);
-			for (i in 0...30)
-				Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2),
-					Std.int(unit.position.y + Globals.CELL_SIZE / 2), Globals.COLOR_SET.Como));
-			result = true;
+		if (unit.tileItem.type != Std.string(UnitType.Stone)) {
+			var c = unit.getCoordinate();
+			var ti = Game.mapDataStorage.getTileItem(c.x, c.y, 0);
+			if (ti != null && ti.type == Std.string(CellType.Trap)) {
+				unit.wound(2);
+				for (i in 0...10)
+					Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2),
+						Std.int(unit.position.y + Globals.CELL_SIZE / 2), 0xff0000));
+				result = true;
+			}
 		}
 
 		return result;
+	}
+
+	public function removeUnit(unit:BaseUnit) {
+		Game.view.units.remove(unit);
+		unit.dispose();
+		unit.remove();
+		unit = null;
+	}
+
+	public function setStone(unit:BaseUnit) {
+		var pos = null;
+		for (u in Game.view.units) {
+			if (u.guid == unit.guid) {
+				pos = u.position.clone();
+				break;
+			}
+		}
+		if (pos != null) {
+			removeUnit(unit);
+
+			var tile = Game.mapDataStorage.getTileItemById(105);
+			var unit:BaseUnit = UnitsFactory.getUnitByTileItem(tile);
+			if (unit != null) {
+				Game.view.unitsContainer.addChild(unit);
+				Game.view.units.push(unit);
+				unit.position.x = pos.x;
+				unit.position.y = pos.y;
+			}
+		}
+	}
+
+	public function moveStone(unit:BaseUnit, from:Coordinate) {
+		var c = unit.getCoordinate();
+		var dx = c.x - from.x;
+		var dy = c.y - from.y;
+		if (Game.mapDataStorage.isWalkable(c.x + dx, c.y + dy)) {
+			var path = [new Coordinate(c.x + dx, c.y + dy)];
+			unit.setPath(path);
+			for (i in 0...4)
+				Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2),
+					Std.int(unit.position.y + Globals.CELL_SIZE / 2), Globals.COLOR_SET.Como));
+		} else {
+			removeUnit(unit);
+			for (i in 0...10)
+				Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2),
+					Std.int(unit.position.y + Globals.CELL_SIZE / 2), Globals.COLOR_SET.SpringRain));
+		}
+
 	}
 
 	public function pause(isPause:Bool) {

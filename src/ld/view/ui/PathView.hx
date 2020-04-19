@@ -42,6 +42,6 @@ class PathView extends GameObject {
 			graphics.drawRect(tx - 2, ty - 2, 4, 4);
 			graphics.endFill();
 		}
-        // this.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
+        this.filter = new Glow(Globals.COLOR_SET.Aztec, 0, 0.1);
 	}
 }
