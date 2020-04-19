@@ -24,6 +24,8 @@ class GameController {
 				mapDataStorage = new MapDataStorage(hxd.Res.map1);
 			case 2:
 				mapDataStorage = new MapDataStorage(hxd.Res.map2);
+			case 3:
+				mapDataStorage = new MapDataStorage(hxd.Res.map2);
 		}
 		Game.mapDataStorage = mapDataStorage;
 		Game.view.init();
@@ -31,6 +33,7 @@ class GameController {
 		this.isPause = false;
 		steps = 0;
 		lockInput(false);
+		isCompleted = false;
 	}
 
 	public function lockInput(isLock:Bool) {
@@ -54,8 +57,9 @@ class GameController {
 						unit.visible = false;
 						for (i in 0...10)
 							Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2),
-								Std.int(unit.position.y + Globals.CELL_SIZE / 2), 0x29a2d9));
+						Std.int(unit.position.y + Globals.CELL_SIZE / 2), 0x29a2d9));
 						if (!isLocked)
+							Game.soundManager.playSound(Globals.SFX_SET.Door, 0.2);
 							haxe.Timer.delay(function() {
 								Game.uiManager.hudScreen.showResult();
 							}, 2000);
@@ -66,8 +70,6 @@ class GameController {
 		}
 	}
 
-	
-
 	public function checkTrap(unit:BaseUnit):Bool {
 		var result:Bool = false;
 		if (!isCompleted) {
@@ -76,6 +78,16 @@ class GameController {
 				var ti = Game.mapDataStorage.getTileItem(c.x, c.y, 0);
 				if (ti != null && ti.type == Std.string(CellType.Trap)) {
 					unit.wound(2);
+					Game.soundManager.playSound(Globals.SFX_SET.Wound, 1);
+					if (unit.hp <= 0) {
+
+						if (unit.tileItem.type == Std.string(UnitType.King)) {
+							unit.setPath([]);
+							removeUnit(unit);
+						} else {
+							Game.controller.setStone(unit);
+						}
+					}
 					for (i in 0...10)
 						Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2),
 							Std.int(unit.position.y + Globals.CELL_SIZE / 2), 0xff0000));
@@ -83,13 +95,12 @@ class GameController {
 				}
 			}
 		}
-
 		return result;
 	}
 
 	public function removeUnit(unit:BaseUnit) {
 		if (unit.tileItem.type == Std.string(UnitType.King)) {
-			for (i in 0...10)
+			for (i in 0...30)
 				Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2),
 					Std.int(unit.position.y + Globals.CELL_SIZE / 2), 0xff0000));
 			if (!isLocked)
@@ -142,19 +153,21 @@ class GameController {
 						Std.int((c.y + dy) * Globals.CELL_SIZE + Globals.CELL_SIZE / 2), Globals.COLOR_SET.TimberGreen));
 			} else {
 				var path = [new Coordinate(c.x + dx, c.y + dy)];
+				Game.soundManager.playSound(Globals.SFX_SET.MoveStone, 0.5);
 				unit.setPath(path);
 			}
 			for (i in 0...4)
 				Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2),
 					Std.int(unit.position.y + Globals.CELL_SIZE / 2), Globals.COLOR_SET.Como));
 		} else {
+			Game.soundManager.playSound(Globals.SFX_SET.MoveStone, 0.8);
 			removeUnit(unit);
 			for (i in 0...10)
 				Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2),
 					Std.int(unit.position.y + Globals.CELL_SIZE / 2), Globals.COLOR_SET.SpringRain));
 		}
 	}
-
+	
 	public function pause(isPause:Bool) {
 		this.isPause = isPause;
 	}

@@ -4,7 +4,7 @@ import ld.utils.macros.ProjectMacros;
 
 class Globals {
 	// Config
-	public static var skipMainMenu:Bool = false;
+	public static var skipMainMenu:Bool = true;
 
 	// Constants
 	public static var VERSION:String = "v. " + "0.1.0.1 " + ProjectMacros.getBuildDate().toString();
@@ -30,8 +30,12 @@ class Globals {
 	public static var SFX_SET = {
 		UIHover: "uiHov",
 		Transition: "transition",
-		Test1: "test",
-		Test2: "t2"
+		MoveStone: "moveStone",
+		UnitSelect: "UnitSelect",
+		CrownSelect: "CrownSelect",
+		UnitStep: "UnitStep",
+		Wound: "Wound",
+		Door: "Door",
 	}
 
 	public static inline var TITLE_SCREEN = "titleScreen";

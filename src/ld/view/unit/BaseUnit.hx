@@ -33,7 +33,7 @@ class BaseUnit extends GameObject {
 	public var moveDelay:Float = 0;
 
 	var path:Array<Coordinate> = null;
-	var hp:Float = 10;
+	public var hp:Float = 10;
 	var hpCapacity:Float = 10;
 	var hpKoef:Float = 1;
 	var pe:ParticleEmitter;
@@ -142,15 +142,14 @@ class BaseUnit extends GameObject {
 				var nC = path.shift();
 				checked = false;
 				position = new Point(nC.x * Globals.CELL_SIZE, nC.y * Globals.CELL_SIZE);
+				Game.soundManager.playSound(Globals.SFX_SET.UnitStep, 0.6);
 			}
-		} else {
-			if (this.hp <= 0)
-					Game.controller.setStone(this);
 		}
 		if (pe != null) {
 			pe.position = new Point(position.x + Globals.CELL_SIZE / 2, position.y + Globals.CELL_SIZE / 3);
 		}
 	}
+
 
 	public function dispose() {
 		if (pe != null) {

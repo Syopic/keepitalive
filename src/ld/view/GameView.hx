@@ -156,6 +156,11 @@ class GameView extends Object {
 		clearUnitSelection();
 		selectedUnit = unit;
 		unit.select(true);
+		if (unit.tileItem.type == Std.string(UnitType.King)) {
+			Game.soundManager.playSound(Globals.SFX_SET.CrownSelect, 0.8);
+		} else {
+			Game.soundManager.playSound(Globals.SFX_SET.UnitSelect, 0.5);
+		}
 	}
 
 	public function clearUnitSelection() {
@@ -164,7 +169,7 @@ class GameView extends Object {
 		}
 		selectedUnit = null;
 	}
-
+	
 	public function addDot(c:Coordinate) {
 		var dot = new DotView(dotsContainer);
 		dot.position = new Point((c.x) * Globals.CELL_SIZE, c.y * Globals.CELL_SIZE);
