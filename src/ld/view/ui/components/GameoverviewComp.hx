@@ -22,7 +22,7 @@ class GameoverviewComp extends h2d.Flow implements h2d.domkit.Object {
 	</gameoverview>;
 
 	public dynamic function onRestart() {
-		Game.uiManager.changeScreen(Globals.HUD_SCREEN);
+		Game.uiManager.changeScreen(Globals.HUD_SCREEN, false, true);
 	}
 	public dynamic function onBack() {
 		Game.uiManager.changeScreen(Globals.TITLE_SCREEN);

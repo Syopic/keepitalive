@@ -30,10 +30,11 @@ class ResultviewComp extends h2d.Flow implements h2d.domkit.Object {
 		Game.uiManager.hudScreen.pause();
 	}
 
+
 	public dynamic function onRestart() {
 		trace("onRestart");
 		clearAll();
-		Game.uiManager.changeScreen(Globals.HUD_SCREEN);
+		Game.uiManager.changeScreen(Globals.HUD_SCREEN, false, true);
 	}
 
 	public dynamic function onNextLevel() {

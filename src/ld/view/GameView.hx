@@ -133,6 +133,7 @@ class GameView extends Object {
 		cursor = new GameCursor(uiContainer);
 		cursor.visible = false;
 		camera.addChild(ps);
+		checkLinks();
 	}
 
 	public function drawMap() {
@@ -349,6 +350,6 @@ class GameView extends Object {
 		} else
 			cursor.visible = false;
 
-		checkLinks();
+		
 	}
 }

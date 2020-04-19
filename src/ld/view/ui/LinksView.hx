@@ -24,7 +24,7 @@ class LinksView extends GameObject {
     
 	public function drawPath(path:Array<Coordinate>) {
 		if (path != null && path.length > 0) {
-            graphics.lineStyle(4, 0x292929);
+            graphics.lineStyle(4, 0x393939, 0.8);
 			// trace(path);
             
 			for (i in 0...path.length) {

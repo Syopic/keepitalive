@@ -154,6 +154,8 @@ class BaseUnit extends GameObject {
 				checked = false;
 				position = new Point(nC.x * Globals.CELL_SIZE, nC.y * Globals.CELL_SIZE);
 				Game.soundManager.playSound(Globals.SFX_SET.UnitStep, 0.6);
+				if (path.length == 0)
+				Game.view.checkLinks();
 			}
 		}
 		if (pe != null) {

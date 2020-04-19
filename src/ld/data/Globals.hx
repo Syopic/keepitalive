@@ -4,7 +4,7 @@ import ld.utils.macros.ProjectMacros;
 
 class Globals {
 	// Config
-	public static var skipMainMenu:Bool = true;
+	public static var skipMainMenu:Bool = false;
 
 	// Constants
 	public static var VERSION:String = "v. " + "0.1.0.1 " + ProjectMacros.getBuildDate().toString();
@@ -20,7 +20,7 @@ class Globals {
 		SpringRain: 0xffc4cfa1,
 		Como: 0xff8b956d,
 		TimberGreen: 0xff4d533c,
-		Aztec: 0xff1f1f1f
+		Aztec: 0xff090909
 	}
 
 	public static var MUSIC_SET = {
@@ -43,4 +43,5 @@ class Globals {
 	public static inline var GAMEOVER_SCREEN = "gameoverScreen";
 	public static inline var HUD_SCREEN = "hudScreen";
 	public static inline var LEVELSELECT_SCREEN = "levelSelect";
+	public static inline var INTRO_SCREEN = "introScreen";
 }

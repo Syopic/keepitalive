@@ -14,6 +14,7 @@ class GameController {
 	public var isPause:Bool = false;
 	public var isLocked:Bool = false;
 	public var isCompleted:Bool = false;
+	// public var isSkipBrief:Bool = false;
 	public var steps:Int = 0;
 
 	public function new() {}
@@ -21,7 +22,7 @@ class GameController {
 	public function startGame(level:Int = 1) {
 		switch (level) {
 			case 1:
-				mapDataStorage = new MapDataStorage(hxd.Res.map);
+				mapDataStorage = new MapDataStorage(hxd.Res.map1);
 			case 2:
 				mapDataStorage = new MapDataStorage(hxd.Res.map2);
 			case 3:
@@ -35,6 +36,7 @@ class GameController {
 		isCompleted = false;
 		lockInput(false);
 	}
+
 
 	public function lockInput(isLock:Bool) {
 		isLocked = isLock;
@@ -53,7 +55,7 @@ class GameController {
 					&& unit.tileItem != null
 					&& unit.tileItem.type == Std.string(UnitType.King)
 					&& ti.type == Std.string(CellType.WinTarget)) {
-					if (Game.uiManager.hudScreen != null) {
+					if (Game.uiManager.hudScreen != null && !isCompleted) {
 						unit.visible = false;
 						for (i in 0...10)
 							Game.view.ps.addParticle(ParticleHelper.fontan(Std.int(unit.position.x + Globals.CELL_SIZE / 2),
@@ -69,7 +71,7 @@ class GameController {
 				}
 		}
 	}
-
+	
 	public function checkTrap(unit:BaseUnit):Bool {
 		var result:Bool = false;
 		if (!isCompleted) {
@@ -77,7 +79,7 @@ class GameController {
 				var c = unit.getCoordinate();
 				var ti = Game.mapDataStorage.getTileItem(c.x, c.y, 0);
 				if (ti != null && ti.type == Std.string(CellType.Trap)) {
-					unit.wound(2);
+					unit.wound(4);
 					Game.soundManager.playSound(Globals.SFX_SET.Wound, 1);
 					if (unit.hp <= 0) {
 

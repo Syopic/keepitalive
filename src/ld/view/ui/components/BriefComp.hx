@@ -20,9 +20,11 @@ class BriefComp extends Object {
 	var currentMessage:Int = -1;
 	var messages:Array<BriefMessage>;
 	var nextButtonDelay:Int = 20;
+	var id:String = "";
 
-	public function new(?parent:Object) {
+	public function new(id:String, ?parent:Object) {
 		super(parent);
+		this.id = id;
 		messages = new Array<BriefMessage>();
 		var tile = Tile.fromColor(Globals.COLOR_SET.SpringRain, Globals.STAGE_WIDTH, 40);
 		bg = new Bitmap(tile, this);
@@ -35,7 +37,8 @@ class BriefComp extends Object {
 		messageTF.textAlign = Left;
 		messageTF.setPosition(6, Globals.STAGE_HEIGHT - 36);
 
-		nextButton = new Bitmap(Game.controller.mapDataStorage.getTileById(239), this);
+		
+		nextButton = new Bitmap(hxd.Res.img.uiTileSet.toTile().sub(0, 8, 8, 8), this);
 		nextButton.setPosition(Globals.STAGE_WIDTH - 12, Globals.STAGE_HEIGHT - 10);
 		nextButton.visible = false;
 		var interaction = new Interactive(Globals.STAGE_WIDTH, 40, this);
@@ -59,6 +62,7 @@ class BriefComp extends Object {
 		setImage();
 	}
 
+
 	function setImage() {
 		var message = messages[currentMessage];
 		if (heroImg != null)
@@ -66,7 +70,9 @@ class BriefComp extends Object {
 		heroImg = null;
 
 		heroImg = new Bitmap(message.img, this);
-		heroImg.y = bg.y - message.img.height;
+		heroImg.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);
+		
+		heroImg.y = bg.y - message.img.height - 1;
 		if (!message.isLeft) {
 			heroImg.x = Globals.STAGE_WIDTH - message.img.width;
 		}
@@ -79,14 +85,14 @@ class BriefComp extends Object {
 			messageTF.text = "";
 			setImage();
 		} else {
-			Game.uiManager.hideBrief();
+			Game.uiManager.hideBrief(this.id);
 		}
 	}
 
 	public function update(dt:Float) {
 		if (currentMessage >= 0) {
 			if (messages[currentMessage].text.length > cursorPosition) {
-				cursorPosition += dt * 10;
+				cursorPosition += dt * 20;
 				nextButton.visible = false;
 			} else {
 				nextButton.visible = true;

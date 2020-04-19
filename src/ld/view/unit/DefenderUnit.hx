@@ -3,12 +3,7 @@ package ld.view.unit;
 import h2d.Anim;
 import hxd.Res;
 import ld.data.MapDataStorage.TileItem;
-import h2d.Bitmap;
-import h2d.filter.Glow;
-import hxd.Cursor;
-import h2d.Interactive;
 import h2d.Object;
-import ld.data.Globals;
 
 class DefenderUnit extends BaseUnit {
 
