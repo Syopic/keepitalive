@@ -12,8 +12,8 @@ class ArcherUnit extends BaseUnit {
         hpKoef = 1;
 
         bitmap.visible = false;
-        var tile = Res.img.anim.arch_png.toTile();
-        anim = new Anim(tile.split(2), Math.random(), animContainer);
+        var tile = Res.img.anim.arch1.toTile();
+        anim = new Anim(tile.split(3), Math.random(), animContainer);
         anim.pause = true;
 
         // anim.filter = new Glow(Globals.COLOR_SET.Aztec, 1, 0.1);

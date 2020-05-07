@@ -162,7 +162,7 @@ class BaseUnit extends GameObject {
 			pe.position = new Point(position.x + Globals.CELL_SIZE / 2, position.y + Globals.CELL_SIZE / 3);
 		}
 		if (anim != null) {
-			anim.currentFrame += dt * anim.speed;
+			anim.currentFrame += dt * anim.speed * 3;
 		}
 	}
 
