@@ -1,0 +1,16 @@
+menubutton {
+	padding : 2;
+	padding-left : 7;
+	padding-bottom : 3;
+	width: 95;
+	background : #000000;
+	content-halign : middle;
+	margin : 0;
+}
+
+menubutton text {
+	font : url("font/gb.fnt");
+	scale: 1;
+	text-color : #4d533c;
+	text-align : middle;
+}

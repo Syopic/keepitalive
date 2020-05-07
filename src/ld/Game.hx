@@ -23,7 +23,7 @@ class Game extends hxd.App {
 
 
 	static function main() {
-		hxd.Res.initEmbed();
+		hxd.Res.initLocal();
 		instance = new Game();
 	}
 

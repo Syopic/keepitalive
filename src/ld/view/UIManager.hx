@@ -202,7 +202,7 @@ class UIManager extends Object {
 			briefComp.addMessage({img: Res.img.archBrief.toTile(), text: "It looks like\nthey are not\nready yet. Heh", isLeft: false});
 			briefComp.addMessage({img: Res.img.crownBrief.toTile(), text: "Well. Remember -\nI have to stay\nalive!", isLeft: true});
 			briefComp.start();
-		} else if (id == "level 1") {
+		} else if (id == "level 1-") {
 			briefComp = new BriefComp(id);
 			container.addChild(briefComp);
 			briefComp.addMessage({img: Res.img.crownBrief.toTile(), text: "It seems\nvery simple", isLeft: true});
@@ -224,7 +224,7 @@ class UIManager extends Object {
 			briefComp.addMessage({img: Res.img.archBrief.toTile(), text: "You can drag\nwith the\nmouse wheel", isLeft: false});
 
 			briefComp.start();
-		} else {
+		} else if (briefComp!= null){
 			briefComp.dispose();
 			briefComp = null;
 		}
